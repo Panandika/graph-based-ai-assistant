@@ -1,4 +1,5 @@
-from collections.abc import Callable, Hashable
+import re
+from collections.abc import Awaitable, Callable, Hashable
 from typing import Annotated, Any, TypedDict, cast
 
 from langchain_core.messages import AIMessage, BaseMessage, HumanMessage
@@ -9,8 +10,8 @@ from langgraph.graph.message import add_messages
 from langgraph.graph.state import CompiledStateGraph
 from pymongo import MongoClient
 
-from app.core.config import get_settings
-from app.core.llm import get_llm
+from app.core.config import LLMProvider, get_settings
+from app.core.llm import get_llm, validate_model
 from app.models.graph import Graph, NodeType
 
 
@@ -30,14 +31,49 @@ def get_checkpointer() -> MongoDBSaver:
     return MongoDBSaver(client, db_name=settings.database_name)
 
 
-async def llm_node(state: AgentState) -> dict[str, Any]:
-    """Process state through LLM."""
-    llm = get_llm()
-    response = await llm.ainvoke(state["messages"])
-    return {
-        "messages": [response],
-        "output_data": {"response": response.content},
-    }
+def interpolate_prompt(template: str, variables: dict[str, Any]) -> str:
+    """Replace {{variable}} placeholders with values from variables dict."""
+
+    def replacer(match: re.Match[str]) -> str:
+        key = match.group(1).strip()
+        return str(variables.get(key, match.group(0)))
+
+    return re.sub(r"\{\{(\w+)\}\}", replacer, template)
+
+
+def create_llm_node(
+    node_config: dict[str, Any],
+) -> Callable[[AgentState], Awaitable[dict[str, Any]]]:
+    """Factory to create an LLM node function with specific configuration."""
+    provider_str = node_config.get("provider", "openai")
+    model = node_config.get("model", "gpt-4o-mini")
+    prompt_template = node_config.get("prompt", "")
+
+    try:
+        provider = LLMProvider(provider_str)
+    except ValueError:
+        provider = LLMProvider.OPENAI
+
+    if not validate_model(provider, model):
+        settings = get_settings()
+        model = settings.default_model
+
+    async def llm_node(state: AgentState) -> dict[str, Any]:
+        """Process state through LLM with node-specific configuration."""
+        llm = get_llm(provider=provider, model=model)
+        messages = list(state["messages"])
+
+        if prompt_template:
+            interpolated = interpolate_prompt(prompt_template, state["input_data"])
+            messages.insert(0, HumanMessage(content=interpolated))
+
+        response = await llm.ainvoke(messages)
+        return {
+            "messages": [response],
+            "output_data": {"response": response.content},
+        }
+
+    return llm_node
 
 
 async def tool_node(state: AgentState) -> dict[str, Any]:
@@ -85,7 +121,8 @@ class GraphExecutor:
             elif node_type == NodeType.END:
                 node_map[node_id] = END
             elif node_type == NodeType.LLM:
-                builder.add_node(node_id, llm_node)
+                llm_fn = create_llm_node(node.data.config)
+                builder.add_node(node_id, llm_fn)  # type: ignore[call-overload]
                 node_map[node_id] = node_id
             elif node_type == NodeType.TOOL:
                 builder.add_node(node_id, tool_node)

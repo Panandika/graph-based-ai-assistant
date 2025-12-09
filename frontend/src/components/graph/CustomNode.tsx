@@ -1,6 +1,9 @@
 import { Handle, Position, type NodeProps } from "@xyflow/react";
 
+import type { LLMProvider } from "@/constants/llm";
 import type { NodeData } from "@/types";
+
+import { LLMNodeConfig } from "./LLMNodeConfig";
 
 const nodeStyles: Record<string, { bg: string; border: string }> = {
   llm: { bg: "bg-blue-100", border: "border-blue-500" },
@@ -10,14 +13,16 @@ const nodeStyles: Record<string, { bg: string; border: string }> = {
   end: { bg: "bg-red-100", border: "border-red-500" },
 };
 
-export function CustomNode({ data, selected }: NodeProps) {
+export function CustomNode({ id, data, selected }: NodeProps) {
   const nodeData = data as NodeData;
   const style = nodeStyles[nodeData.nodeType] || nodeStyles.start;
+  const isLLMNode = nodeData.nodeType === "llm";
 
   return (
     <div
       className={`
-        px-4 py-2 rounded-lg border-2 min-w-[120px]
+        px-4 py-2 rounded-lg border-2
+        ${isLLMNode ? "min-w-[280px]" : "min-w-[120px]"}
         ${style.bg} ${style.border}
         ${selected ? "ring-2 ring-blue-400" : ""}
       `}
@@ -30,6 +35,19 @@ export function CustomNode({ data, selected }: NodeProps) {
         <div className="text-xs text-gray-500 uppercase">{nodeData.nodeType}</div>
         <div className="font-medium">{nodeData.label}</div>
       </div>
+
+      {isLLMNode && (
+        <LLMNodeConfig
+          nodeId={id}
+          config={
+            nodeData.config as {
+              provider?: LLMProvider;
+              model?: string;
+              prompt?: string;
+            }
+          }
+        />
+      )}
 
       {nodeData.nodeType !== "end" && (
         <Handle type="source" position={Position.Bottom} className="w-3 h-3" />

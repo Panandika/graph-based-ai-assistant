@@ -7,6 +7,16 @@ from pydantic import SecretStr
 
 from app.core.config import LLMProvider, get_settings
 
+SUPPORTED_MODELS: dict[LLMProvider, list[str]] = {
+    LLMProvider.OPENAI: ["gpt-4o-mini", "gpt-4o"],
+    LLMProvider.ANTHROPIC: ["claude-3-5-sonnet-latest", "claude-3-5-haiku-latest"],
+}
+
+
+def validate_model(provider: LLMProvider, model: str) -> bool:
+    """Validate that the model is supported for the given provider."""
+    return model in SUPPORTED_MODELS.get(provider, [])
+
 
 class LLMFactory:
     """Factory for creating LLM instances based on configuration."""

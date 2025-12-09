@@ -9,6 +9,7 @@ import {
 import "@xyflow/react/dist/style.css";
 import { useCallback } from "react";
 
+import { DEFAULT_LLM_CONFIG } from "@/constants/llm";
 import { useGraphStore } from "@/store/useGraphStore";
 import type { NodeData, NodeType } from "@/types";
 
@@ -45,6 +46,8 @@ export function GraphEditor() {
         y: event.clientY - 100,
       };
 
+      const config = type === "llm" ? { ...DEFAULT_LLM_CONFIG } : {};
+
       const newNode: Node<NodeData> = {
         id: `${type}-${Date.now()}`,
         type: "custom",
@@ -52,7 +55,7 @@ export function GraphEditor() {
         data: {
           label: `New ${type}`,
           nodeType: type,
-          config: {},
+          config,
         },
       };
 

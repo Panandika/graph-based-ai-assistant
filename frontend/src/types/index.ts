@@ -5,6 +5,12 @@ export interface Position {
   y: number;
 }
 
+export interface LLMNodeConfig {
+  provider: "openai" | "anthropic";
+  model: string;
+  prompt: string;
+}
+
 export interface NodeData {
   label: string;
   nodeType: NodeType;
