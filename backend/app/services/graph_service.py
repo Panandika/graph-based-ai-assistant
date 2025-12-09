@@ -153,7 +153,10 @@ class GraphExecutor:
 
         return {
             "messages": [
-                {"role": "ai" if isinstance(m, AIMessage) else "human", "content": m.content}
+                {
+                    "role": "ai" if isinstance(m, AIMessage) else "human",
+                    "content": m.content,
+                }
                 for m in result.get("messages", [])
             ],
             "output_data": result.get("output_data", {}),
