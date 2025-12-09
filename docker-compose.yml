@@ -1,0 +1,74 @@
+services:
+  backend:
+    build:
+      context: ./backend
+      target: development
+    container_name: graph-ai-backend
+    volumes:
+      - ./backend/app:/app/app
+    ports:
+      - "8000:8000"
+    environment:
+      - MONGODB_URL=mongodb://mongo:27017
+      - DATABASE_NAME=graph_ai
+      - ENVIRONMENT=development
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY:-}
+    depends_on:
+      mongo:
+        condition: service_healthy
+    networks:
+      - graph-ai-network
+
+  frontend:
+    build:
+      context: ./frontend
+      target: development
+    container_name: graph-ai-frontend
+    volumes:
+      - ./frontend/src:/app/src
+      - ./frontend/public:/app/public
+    ports:
+      - "5173:5173"
+    environment:
+      - VITE_API_URL=http://localhost:8000
+    depends_on:
+      - backend
+    networks:
+      - graph-ai-network
+
+  mongo:
+    image: mongo:7
+    container_name: graph-ai-mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+    healthcheck:
+      test: mongosh --eval 'db.runCommand({ ping: 1 })'
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - graph-ai-network
+
+  mongo-express:
+    image: mongo-express:latest
+    container_name: graph-ai-mongo-express
+    ports:
+      - "8081:8081"
+    environment:
+      - ME_CONFIG_MONGODB_URL=mongodb://mongo:27017/
+      - ME_CONFIG_BASICAUTH=false
+    depends_on:
+      mongo:
+        condition: service_healthy
+    networks:
+      - graph-ai-network
+
+volumes:
+  mongo_data:
+
+networks:
+  graph-ai-network:
+    driver: bridge
