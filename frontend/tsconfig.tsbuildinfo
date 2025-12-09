@@ -1,0 +1,1 @@
+{"root":["./src/app.tsx","./src/main.tsx","./src/vite-env.d.ts","./src/components/graph/customnode.tsx","./src/components/graph/grapheditor.tsx","./src/components/graph/nodepalette.tsx","./src/services/api.ts","./src/store/usegraphstore.ts","./src/test/app.test.tsx","./src/test/setup.ts","./src/types/index.ts"],"version":"5.6.3"}

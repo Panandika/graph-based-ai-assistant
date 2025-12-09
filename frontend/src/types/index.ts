@@ -9,6 +9,7 @@ export interface NodeData {
   label: string;
   nodeType: NodeType;
   config: Record<string, unknown>;
+  [key: string]: unknown;
 }
 
 export interface GraphNode {
