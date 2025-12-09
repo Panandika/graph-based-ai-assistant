@@ -17,7 +17,7 @@ install-backend: ## Install backend dependencies
 	cd backend && uv sync
 
 install-frontend: ## Install frontend dependencies
-	cd frontend && npm ci
+	cd frontend && npm install
 
 # Linting
 lint: lint-backend lint-frontend ## Run all linters
