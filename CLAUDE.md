@@ -59,7 +59,23 @@
 
 ---
 
-## 3. Coding Standards (Strict Compliance)
+## 3. Development Commands
+
+Use `make help` to see all available commands.
+
+```bash
+make install          # Install all dependencies
+make dev              # Run backend + frontend concurrently
+make dev-backend      # Run backend only
+make dev-frontend     # Run frontend only
+make lint             # Lint all code
+make test             # Run all tests
+make docker-up        # Start with Docker Compose
+```
+
+---
+
+## 4. Coding Standards (Strict Compliance)
 
 * **Error Handling:** Never leave a `try/catch` block empty. Log errors properly.
 * **Comments:** Use Docstrings for Python functions.
@@ -68,7 +84,7 @@
 
 ---
 
-## 4. Version Control, Hygiene & Commits (CRITICAL)
+## 5. Version Control, Hygiene & Commits (CRITICAL)
 
 **Instruction:** You must adhere to strict git hygiene. Do not treat code generation as a "dump."
 
@@ -100,5 +116,5 @@
 
 ---
 
-## 5. Execution Trigger
+## 6. Execution Trigger
 **Action:** Acknowledge this context. Start by proposing the **Folder Structure** for the monorepo and the **pydantic model** for the LangGraph State.
