@@ -1,13 +1,16 @@
-from typing import Annotated, Any, TypedDict
+from collections.abc import Callable, Hashable
+from typing import Annotated, Any, TypedDict, cast
 
 from langchain_core.messages import AIMessage, BaseMessage, HumanMessage
-from langgraph.checkpoint.mongodb.aio import AsyncMongoDBSaver
+from langchain_core.runnables import RunnableConfig
+from langgraph.checkpoint.mongodb import MongoDBSaver
+from pymongo import MongoClient
 from langgraph.graph import END, START, StateGraph
 from langgraph.graph.message import add_messages
+from langgraph.graph.state import CompiledStateGraph
 
 from app.core.config import get_settings
 from app.core.llm import get_llm
-from app.db.database import get_client
 from app.models.graph import Graph, NodeType
 
 
@@ -20,11 +23,11 @@ class AgentState(TypedDict):
     output_data: dict[str, Any]
 
 
-async def get_checkpointer() -> AsyncMongoDBSaver:
+def get_checkpointer() -> MongoDBSaver:
     """Get MongoDB checkpointer for state persistence."""
     settings = get_settings()
-    client = get_client()
-    return AsyncMongoDBSaver(client, db_name=settings.database_name)
+    client: MongoClient[dict[str, Any]] = MongoClient(settings.mongodb_url)
+    return MongoDBSaver(client, db_name=settings.database_name)
 
 
 async def llm_node(state: AgentState) -> dict[str, Any]:
@@ -44,7 +47,9 @@ async def tool_node(state: AgentState) -> dict[str, Any]:
     }
 
 
-def create_condition_router(condition_config: dict[str, Any]):
+def create_condition_router(
+    condition_config: dict[str, Any],
+) -> Callable[[AgentState], str]:
     """Create a conditional router function."""
 
     def router(state: AgentState) -> str:
@@ -63,9 +68,9 @@ class GraphExecutor:
 
     def __init__(self, graph: Graph):
         self.graph = graph
-        self._compiled = None
+        self._compiled: CompiledStateGraph[Any] | None = None
 
-    def _build_graph(self) -> StateGraph:
+    def _build_graph(self) -> StateGraph[AgentState]:
         """Build a LangGraph StateGraph from the graph configuration."""
         builder = StateGraph(AgentState)
 
@@ -101,7 +106,7 @@ class GraphExecutor:
                     e for e in self.graph.edges if e.source == edge.source
                 ]
                 if len(condition_edges) >= 2:
-                    path_map = {}
+                    path_map: dict[str, str] = {}
                     for ce in condition_edges:
                         ce_target = node_map.get(ce.target, ce.target)
                         if ce.source_handle == "true":
@@ -113,7 +118,7 @@ class GraphExecutor:
                         builder.add_conditional_edges(
                             source,
                             create_condition_router(source_node.data.config),
-                            path_map,
+                            cast(dict[Hashable, str], path_map),
                         )
             else:
                 if source == START:
@@ -125,10 +130,10 @@ class GraphExecutor:
 
         return builder
 
-    async def compile(self) -> None:
+    def compile(self) -> None:
         """Compile the graph for execution."""
         builder = self._build_graph()
-        checkpointer = await get_checkpointer()
+        checkpointer = get_checkpointer()
         self._compiled = builder.compile(checkpointer=checkpointer)
 
     async def execute(
@@ -138,7 +143,9 @@ class GraphExecutor:
     ) -> dict[str, Any]:
         """Execute the workflow with the given input."""
         if not self._compiled:
-            await self.compile()
+            self.compile()
+
+        assert self._compiled is not None
 
         initial_state: AgentState = {
             "messages": [HumanMessage(content=str(input_data.get("message", "")))],
@@ -147,7 +154,7 @@ class GraphExecutor:
             "output_data": {},
         }
 
-        config = {"configurable": {"thread_id": thread_id}}
+        config = RunnableConfig(configurable={"thread_id": thread_id})
 
         result = await self._compiled.ainvoke(initial_state, config)
 

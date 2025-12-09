@@ -53,7 +53,7 @@ async def execute_workflow(thread_id: str) -> None:
 
     try:
         executor = GraphExecutor(graph)
-        await executor.compile()
+        executor.compile()
 
         result = await executor.execute(
             thread_id=str(thread.id),

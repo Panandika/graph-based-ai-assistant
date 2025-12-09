@@ -1,4 +1,5 @@
 from datetime import datetime
+from typing import Any
 
 from pydantic import BaseModel, Field
 
@@ -37,7 +38,7 @@ class WorkflowResponse(BaseModel):
 class ThreadCreate(BaseModel):
     """Schema for creating a thread execution."""
 
-    input_data: dict = Field(default_factory=dict)
+    input_data: dict[str, Any] = Field(default_factory=dict)
 
 
 class ThreadResponse(BaseModel):
@@ -47,8 +48,8 @@ class ThreadResponse(BaseModel):
     workflow_id: str
     status: ThreadStatus
     current_node: str | None
-    input_data: dict
-    output_data: dict
+    input_data: dict[str, Any]
+    output_data: dict[str, Any]
     error_message: str | None
     created_at: datetime
     updated_at: datetime
@@ -57,7 +58,7 @@ class ThreadResponse(BaseModel):
 class ExecuteWorkflowRequest(BaseModel):
     """Schema for executing a workflow."""
 
-    input_data: dict = Field(default_factory=dict)
+    input_data: dict[str, Any] = Field(default_factory=dict)
 
 
 class ExecuteWorkflowResponse(BaseModel):

@@ -1,5 +1,6 @@
 from datetime import UTC, datetime
 from enum import Enum
+from typing import Any
 
 from beanie import Document, Indexed
 from pydantic import BaseModel, Field
@@ -25,7 +26,7 @@ class NodeData(BaseModel):
 
     label: str
     node_type: NodeType
-    config: dict = Field(default_factory=dict)
+    config: dict[str, Any] = Field(default_factory=dict)
 
 
 class GraphNode(BaseModel):

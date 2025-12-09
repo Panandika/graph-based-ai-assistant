@@ -1,5 +1,6 @@
 from datetime import UTC, datetime
 from enum import Enum
+from typing import Any
 
 from beanie import Document, Indexed
 from pydantic import Field
@@ -42,8 +43,8 @@ class Thread(Document):
     workflow_id: Indexed(str)  # type: ignore[valid-type]
     status: ThreadStatus = ThreadStatus.PENDING
     current_node: str | None = None
-    input_data: dict = Field(default_factory=dict)
-    output_data: dict = Field(default_factory=dict)
+    input_data: dict[str, Any] = Field(default_factory=dict)
+    output_data: dict[str, Any] = Field(default_factory=dict)
     error_message: str | None = None
     created_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
     updated_at: datetime = Field(default_factory=lambda: datetime.now(UTC))

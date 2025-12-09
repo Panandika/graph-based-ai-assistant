@@ -3,6 +3,7 @@ from typing import Any
 from langchain_anthropic import ChatAnthropic
 from langchain_core.language_models.chat_models import BaseChatModel
 from langchain_openai import ChatOpenAI
+from pydantic import SecretStr
 
 from app.core.config import LLMProvider, get_settings
 
@@ -58,13 +59,13 @@ class LLMFactory:
         if provider == LLMProvider.OPENAI:
             return ChatOpenAI(
                 model=model,
-                api_key=settings.openai_api_key,
+                api_key=SecretStr(settings.openai_api_key),
                 **kwargs,
             )
         elif provider == LLMProvider.ANTHROPIC:
             return ChatAnthropic(
-                model=model,
-                api_key=settings.anthropic_api_key,
+                model_name=model,
+                api_key=SecretStr(settings.anthropic_api_key),
                 **kwargs,
             )
         else:
