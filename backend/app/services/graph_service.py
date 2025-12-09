@@ -4,10 +4,10 @@ from typing import Annotated, Any, TypedDict, cast
 from langchain_core.messages import AIMessage, BaseMessage, HumanMessage
 from langchain_core.runnables import RunnableConfig
 from langgraph.checkpoint.mongodb import MongoDBSaver
-from pymongo import MongoClient
 from langgraph.graph import END, START, StateGraph
 from langgraph.graph.message import add_messages
 from langgraph.graph.state import CompiledStateGraph
+from pymongo import MongoClient
 
 from app.core.config import get_settings
 from app.core.llm import get_llm
