@@ -13,6 +13,11 @@ from pymongo import MongoClient
 from app.core.config import LLMProvider, get_settings
 from app.core.llm import get_llm, validate_model
 from app.models.graph import Graph, NodeType
+from app.services.llm_transform_service import (
+    create_input_image_node,
+    create_input_text_node,
+    create_llm_transform_node,
+)
 
 
 class AgentState(TypedDict):
@@ -123,6 +128,22 @@ class GraphExecutor:
             elif node_type == NodeType.LLM:
                 llm_fn = create_llm_node(node.data.config)
                 builder.add_node(node_id, llm_fn)  # type: ignore[call-overload]
+                node_map[node_id] = node_id
+            elif node_type == NodeType.LLM_TRANSFORM:
+                transform_fn = create_llm_transform_node(node.data.config)
+                builder.add_node(node_id, transform_fn)  # type: ignore[call-overload]
+                node_map[node_id] = node_id
+            elif node_type == NodeType.INPUT_TEXT:
+                import asyncio
+
+                input_fn = asyncio.run(create_input_text_node(node.data.config))
+                builder.add_node(node_id, input_fn)  # type: ignore[call-overload]
+                node_map[node_id] = node_id
+            elif node_type == NodeType.INPUT_IMAGE:
+                import asyncio
+
+                input_fn = asyncio.run(create_input_image_node(node.data.config))
+                builder.add_node(node_id, input_fn)  # type: ignore[call-overload]
                 node_map[node_id] = node_id
             elif node_type == NodeType.TOOL:
                 builder.add_node(node_id, tool_node)
