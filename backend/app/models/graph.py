@@ -12,6 +12,12 @@ class NodeType(str, Enum):
     CONDITION = "condition"
     START = "start"
     END = "end"
+    INPUT_TEXT = "input_text"
+    INPUT_IMAGE = "input_image"
+    INPUT_COMBINED = "input_combined"
+    LLM_TRANSFORM = "llm_transform"
+    CANVA_MCP = "canva_mcp"
+    OUTPUT_EXPORT = "output_export"
 
 
 class Position(BaseModel):

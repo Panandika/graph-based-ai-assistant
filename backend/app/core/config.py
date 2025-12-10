@@ -45,6 +45,21 @@ class Settings(BaseSettings):
     # LangGraph
     langgraph_checkpoint_collection: str = "langgraph_checkpoints"
 
+    # File Upload Configuration
+    upload_dir: str = "./uploads"
+    upload_max_size_mb: int = 10
+    upload_allowed_types: list[str] = [
+        "image/png",
+        "image/jpeg",
+        "image/webp",
+        "image/gif",
+    ]
+    upload_url_base: str = "http://localhost:8000/uploads"
+
+    # Canva MCP Configuration
+    canva_mcp_enabled: bool = True
+    canva_mcp_timeout: int = 30000
+
 
 @lru_cache
 def get_settings() -> Settings:
