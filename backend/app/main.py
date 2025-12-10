@@ -14,8 +14,12 @@ from app.db.database import close_db, init_db
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     """Application lifespan handler for startup and shutdown."""
+    from app.core.mcp import mcp_manager
+
     await init_db()
+    await mcp_manager.initialize()
     yield
+    await mcp_manager.shutdown()
     await close_db()
 
 
