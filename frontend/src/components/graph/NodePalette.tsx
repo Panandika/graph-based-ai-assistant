@@ -8,9 +8,15 @@ interface PaletteItem {
 
 const paletteItems: PaletteItem[] = [
   { type: "start", label: "Start", color: "bg-gray-200" },
+  { type: "input_text", label: "Text Input", color: "bg-purple-200" },
+  { type: "input_image", label: "Image Input", color: "bg-indigo-200" },
+  { type: "input_combined", label: "Combined Input", color: "bg-violet-200" },
   { type: "llm", label: "LLM", color: "bg-blue-200" },
+  { type: "llm_transform", label: "LLM Transform", color: "bg-blue-300" },
   { type: "tool", label: "Tool", color: "bg-green-200" },
+  { type: "canva_mcp", label: "Canva MCP", color: "bg-pink-200" },
   { type: "condition", label: "Condition", color: "bg-yellow-200" },
+  { type: "output_export", label: "Output Export", color: "bg-emerald-200" },
   { type: "end", label: "End", color: "bg-red-200" },
 ];
 

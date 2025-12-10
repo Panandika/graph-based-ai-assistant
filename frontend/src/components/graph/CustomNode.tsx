@@ -51,7 +51,9 @@ export function CustomNode({ id, data, selected }: NodeProps) {
       )}
 
       <div className="text-center">
-        <div className="text-xs text-gray-500 uppercase">{nodeData.nodeType}</div>
+        <div className="text-xs text-gray-500 uppercase">
+          {nodeData.nodeType.replace(/_/g, " ")}
+        </div>
         <div className="font-medium">{nodeData.label}</div>
       </div>
 
