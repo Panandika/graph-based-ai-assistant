@@ -13,6 +13,10 @@ from pymongo import MongoClient
 from app.core.config import LLMProvider, get_settings
 from app.core.llm import get_llm, validate_model
 from app.models.graph import Graph, NodeType
+from app.services.canva_node_service import (
+    create_canva_mcp_node,
+    create_output_export_node,
+)
 from app.services.llm_transform_service import (
     create_input_image_node,
     create_input_text_node,
@@ -144,6 +148,14 @@ class GraphExecutor:
 
                 input_fn = asyncio.run(create_input_image_node(node.data.config))
                 builder.add_node(node_id, input_fn)  # type: ignore[call-overload]
+                node_map[node_id] = node_id
+            elif node_type == NodeType.CANVA_MCP:
+                canva_fn = create_canva_mcp_node(node.data.config)
+                builder.add_node(node_id, canva_fn)  # type: ignore[call-overload]
+                node_map[node_id] = node_id
+            elif node_type == NodeType.OUTPUT_EXPORT:
+                export_fn = create_output_export_node(node.data.config)
+                builder.add_node(node_id, export_fn)  # type: ignore[call-overload]
                 node_map[node_id] = node_id
             elif node_type == NodeType.TOOL:
                 builder.add_node(node_id, tool_node)
