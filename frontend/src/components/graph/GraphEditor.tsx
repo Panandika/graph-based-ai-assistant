@@ -17,6 +17,7 @@ import { CustomNode } from "./CustomNode";
 import { TerminalPanel, type LogEntry } from "./TerminalPanel";
 import { graphService } from "@/services/graph";
 import { useState } from "react";
+import { useToast } from "@/components/ui/ToastContext";
 import { SidebarIcon, TerminalIcon, WindowIcon, PlayIcon } from "../Icons";
 
 interface GraphEditorProps {
@@ -35,6 +36,7 @@ export function GraphEditor({ isSidebarOpen, onToggleSidebar }: GraphEditorProps
   const [isTerminalOpen, setIsTerminalOpen] = useState(false);
   const [isFloatingWindowOpen, setIsFloatingWindowOpen] = useState(false);
   const [logs, setLogs] = useState<LogEntry[]>([]);
+  const { toast } = useToast();
 
   const addLog = (type: LogEntry['type'], message: string, data?: unknown) => {
     setLogs(prev => [...prev, {
@@ -47,7 +49,7 @@ export function GraphEditor({ isSidebarOpen, onToggleSidebar }: GraphEditorProps
 
   const handleRun = async () => {
     if (nodes.length === 0) {
-      alert("Please add some nodes first");
+      toast({ type: 'warning', message: "Please add some nodes first" });
       return;
     }
 
@@ -85,6 +87,7 @@ export function GraphEditor({ isSidebarOpen, onToggleSidebar }: GraphEditorProps
       });
 
       addLog('success', `Execution started. Thread ID: ${execution.thread_id}`);
+      toast({ type: 'success', message: 'Execution started successfully' });
 
       // 4. Poll for status
       const pollInterval = setInterval(async () => {
@@ -95,10 +98,12 @@ export function GraphEditor({ isSidebarOpen, onToggleSidebar }: GraphEditorProps
             clearInterval(pollInterval);
             setIsRunning(false);
             addLog('success', 'Execution completed successfully', status.output_data);
+            toast({ type: 'success', message: 'Execution completed' });
           } else if (status.status === 'FAILED') {
             clearInterval(pollInterval);
             setIsRunning(false);
             addLog('error', `Execution failed: ${status.error_message}`);
+            toast({ type: 'error', message: `Execution failed: ${status.error_message}` });
           } else {
             // Still running, maybe update status if needed
             // addLog('info', `Status: ${status.status}`);
@@ -113,6 +118,7 @@ export function GraphEditor({ isSidebarOpen, onToggleSidebar }: GraphEditorProps
     } catch (error) {
       console.error("Execution failed:", error);
       addLog('error', 'Failed to start execution', error);
+      toast({ type: 'error', message: "Failed to start execution" });
       setIsRunning(false);
     }
   };

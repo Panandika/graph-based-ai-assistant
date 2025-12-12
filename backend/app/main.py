@@ -2,12 +2,15 @@ from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
 from pathlib import Path
 
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
 from app.api.v1.router import api_router
 from app.core.config import get_settings
+from app.core.docs import API_DESCRIPTION, API_TITLE, API_VERSION, tags_metadata
+from app.core.errors import general_exception_handler, http_exception_handler
+from app.core.logging import setup_logging
 from app.db.database import close_db, init_db
 
 
@@ -25,12 +28,14 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
 
 def create_app() -> FastAPI:
     """Create and configure the FastAPI application."""
+    setup_logging()
     settings = get_settings()
 
     app = FastAPI(
-        title="Graph AI Assistant API",
-        description="API for graph-based AI workflow orchestration with LangGraph",
-        version="0.1.0",
+        title=API_TITLE,
+        description=API_DESCRIPTION,
+        version=API_VERSION,
+        openapi_tags=tags_metadata,
         lifespan=lifespan,
     )
 
@@ -43,6 +48,8 @@ def create_app() -> FastAPI:
     )
 
     app.include_router(api_router, prefix=settings.api_v1_prefix)
+    app.add_exception_handler(HTTPException, http_exception_handler)
+    app.add_exception_handler(Exception, general_exception_handler)
 
     # Mount static files for uploads
     upload_dir = Path(settings.upload_dir)

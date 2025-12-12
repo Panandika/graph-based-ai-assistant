@@ -1,4 +1,6 @@
-const API_BASE = "/api/v1";
+import { config } from "@/config/env";
+
+const API_BASE = config.API_BASE_URL;
 
 class ApiError extends Error {
   constructor(
