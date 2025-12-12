@@ -27,15 +27,17 @@ export function NodePalette() {
   };
 
   return (
-    <div className="p-4 bg-white border-r border-gray-200 w-48">
-      <h3 className="font-semibold mb-4">Nodes</h3>
+    <div className="p-4 bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 w-48 transition-colors">
+      <h3 className="font-semibold mb-4 text-gray-900 dark:text-gray-100">Nodes</h3>
       <div className="space-y-2">
         {paletteItems.map((item) => (
           <div
             key={item.type}
             className={`
-              p-2 rounded cursor-grab border border-gray-300
-              ${item.color} hover:opacity-80 transition-opacity
+              p-2 rounded cursor-grab border border-gray-300 dark:border-gray-700
+              ${item.color}
+              text-gray-900 dark:text-gray-900 font-medium
+              hover:opacity-80 transition-all
             `}
             draggable
             onDragStart={(e) => onDragStart(e, item.type)}

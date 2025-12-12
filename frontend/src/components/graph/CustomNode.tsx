@@ -15,17 +15,17 @@ import { InputImageNodeConfig } from "./nodes/InputImageNodeConfig";
 import { InputCombinedNodeConfig } from "./nodes/InputCombinedNodeConfig";
 
 const nodeStyles: Record<string, { bg: string; border: string }> = {
-  llm: { bg: "bg-blue-100", border: "border-blue-500" },
-  tool: { bg: "bg-green-100", border: "border-green-500" },
-  condition: { bg: "bg-yellow-100", border: "border-yellow-500" },
-  start: { bg: "bg-gray-100", border: "border-gray-500" },
-  end: { bg: "bg-red-100", border: "border-red-500" },
-  input_text: { bg: "bg-purple-100", border: "border-purple-500" },
-  input_image: { bg: "bg-indigo-100", border: "border-indigo-500" },
-  input_combined: { bg: "bg-violet-100", border: "border-violet-500" },
-  llm_transform: { bg: "bg-blue-100", border: "border-blue-500" },
-  canva_mcp: { bg: "bg-pink-100", border: "border-pink-500" },
-  output_export: { bg: "bg-emerald-100", border: "border-emerald-500" },
+  llm: { bg: "bg-blue-100 dark:bg-blue-900/40", border: "border-blue-500 dark:border-blue-400" },
+  tool: { bg: "bg-green-100 dark:bg-green-900/40", border: "border-green-500 dark:border-green-400" },
+  condition: { bg: "bg-yellow-100 dark:bg-yellow-900/40", border: "border-yellow-500 dark:border-yellow-400" },
+  start: { bg: "bg-gray-100 dark:bg-gray-800", border: "border-gray-500 dark:border-gray-400" },
+  end: { bg: "bg-red-100 dark:bg-red-900/40", border: "border-red-500 dark:border-red-400" },
+  input_text: { bg: "bg-purple-100 dark:bg-purple-900/40", border: "border-purple-500 dark:border-purple-400" },
+  input_image: { bg: "bg-indigo-100 dark:bg-indigo-900/40", border: "border-indigo-500 dark:border-indigo-400" },
+  input_combined: { bg: "bg-violet-100 dark:bg-violet-900/40", border: "border-violet-500 dark:border-violet-400" },
+  llm_transform: { bg: "bg-blue-100 dark:bg-blue-900/40", border: "border-blue-500 dark:border-blue-400" },
+  canva_mcp: { bg: "bg-pink-100 dark:bg-pink-900/40", border: "border-pink-500 dark:border-pink-400" },
+  output_export: { bg: "bg-emerald-100 dark:bg-emerald-900/40", border: "border-emerald-500 dark:border-emerald-400" },
 };
 
 export function CustomNode({ id, data, selected }: NodeProps) {
@@ -79,7 +79,7 @@ export function CustomNode({ id, data, selected }: NodeProps) {
       )}
 
       <div className="text-center">
-        <div className="text-xs text-gray-500 uppercase">
+        <div className="text-xs text-gray-500 dark:text-gray-400 uppercase">
           {nodeData.nodeType.replace(/_/g, " ")}
         </div>
         <div className="font-medium">{nodeData.label}</div>

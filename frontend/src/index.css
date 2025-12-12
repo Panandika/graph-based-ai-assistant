@@ -12,9 +12,47 @@ body {
     Oxygen,
     Ubuntu,
     sans-serif;
+  @apply bg-gray-50 text-gray-900 dark:bg-gray-950 dark:text-gray-50;
 }
 
 #root {
   width: 100vw;
   height: 100vh;
+}
+
+/* React Flow Dark Mode Overrides */
+.dark .react-flow__controls {
+  box-shadow: 0 0 2px 1px rgba(0, 0, 0, 0.08);
+}
+
+.dark .react-flow__controls-button {
+  background-color: #1f2937;
+  /* gray-800 */
+  border-bottom: 1px solid #374151;
+  /* gray-700 */
+}
+
+.dark .react-flow__controls-button:hover {
+  background-color: #374151;
+  /* gray-700 */
+}
+
+.dark .react-flow__controls-button svg {
+  fill: #e5e7eb;
+  /* gray-200 */
+}
+
+.dark .react-flow__minimap {
+  background-color: #1f2937;
+  /* gray-800 */
+}
+
+.dark .react-flow__minimap-mask {
+  fill: rgba(0, 0, 0, 0.4);
+}
+
+.dark .react-flow__minimap-node {
+  fill: #374151;
+  /* gray-700 */
+  stroke: none;
 }

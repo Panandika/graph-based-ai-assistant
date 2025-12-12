@@ -172,24 +172,24 @@ export function GraphEditor({ isSidebarOpen, onToggleSidebar }: GraphEditorProps
   return (
     <div className="w-full h-full relative">
       <div className="absolute top-4 right-4 z-10 flex gap-2 items-center">
-        <div className="flex bg-white rounded-lg shadow-sm border border-gray-200 p-1 gap-1 mr-2">
+        <div className="flex bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-1 gap-1 mr-2 transition-colors">
           <button
             onClick={onToggleSidebar}
-            className={`p-2 rounded hover:bg-gray-100 transition-colors ${!isSidebarOpen ? 'text-blue-500' : 'text-gray-600'}`}
+            className={`p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors ${!isSidebarOpen ? 'text-blue-500' : 'text-gray-600 dark:text-gray-300'}`}
             title={isSidebarOpen ? "Hide Sidebar" : "Show Sidebar"}
           >
             <SidebarIcon className="w-5 h-5" />
           </button>
           <button
             onClick={() => setIsTerminalOpen(!isTerminalOpen)}
-            className={`p-2 rounded hover:bg-gray-100 transition-colors ${!isTerminalOpen ? 'text-blue-500' : 'text-gray-600'}`}
+            className={`p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors ${!isTerminalOpen ? 'text-blue-500' : 'text-gray-600 dark:text-gray-300'}`}
             title={isTerminalOpen ? "Hide Terminal" : "Show Terminal"}
           >
             <TerminalIcon className="w-5 h-5" />
           </button>
           <button
             onClick={() => setIsFloatingWindowOpen(!isFloatingWindowOpen)}
-            className={`p-2 rounded hover:bg-gray-100 transition-colors ${isFloatingWindowOpen ? 'text-blue-500' : 'text-gray-600'}`}
+            className={`p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors ${isFloatingWindowOpen ? 'text-blue-500' : 'text-gray-600 dark:text-gray-300'}`}
             title="Toggle Floating Window"
           >
             <WindowIcon className="w-5 h-5" />
@@ -207,17 +207,17 @@ export function GraphEditor({ isSidebarOpen, onToggleSidebar }: GraphEditorProps
       </div>
 
       {isFloatingWindowOpen && (
-        <div className="absolute top-20 right-4 w-80 h-64 bg-white rounded-lg shadow-xl border border-gray-200 z-50 flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-200">
-          <div className="bg-gray-50 px-4 py-2 border-b border-gray-200 flex justify-between items-center">
-            <h3 className="text-sm font-medium text-gray-700">Preview</h3>
+        <div className="absolute top-20 right-4 w-80 h-64 bg-white dark:bg-gray-800 rounded-lg shadow-xl border border-gray-200 dark:border-gray-700 z-50 flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+          <div className="bg-gray-50 dark:bg-gray-900 px-4 py-2 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
+            <h3 className="text-sm font-medium text-gray-700 dark:text-gray-200">Preview</h3>
             <button
               onClick={() => setIsFloatingWindowOpen(false)}
-              className="text-gray-400 hover:text-gray-600"
+              className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
             >
               ×
             </button>
           </div>
-          <div className="p-4 flex-1 flex items-center justify-center text-gray-400 text-sm">
+          <div className="p-4 flex-1 flex items-center justify-center text-gray-400 dark:text-gray-500 text-sm">
             Floating Window Content
           </div>
         </div>
