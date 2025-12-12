@@ -15,16 +15,18 @@ class TestCanvaMCPNode:
     @patch("app.services.canva_node_service.canva_service")
     async def test_create_design_operation(self, mock_service):
         """Test Canva node with create operation."""
-        mock_service.create_design = AsyncMock(return_value=type(
-            "Response",
-            (),
-            {
-                "success": True,
-                "design_id": "new-123",
-                "design_url": "https://canva.com/design/new-123",
-                "error": None,
-            },
-        )())
+        mock_service.create_design = AsyncMock(
+            return_value=type(
+                "Response",
+                (),
+                {
+                    "success": True,
+                    "design_id": "new-123",
+                    "design_url": "https://canva.com/design/new-123",
+                    "error": None,
+                },
+            )()
+        )
 
         config = {
             "operation": "create",
@@ -53,19 +55,23 @@ class TestCanvaMCPNode:
     @patch("app.services.canva_node_service.canva_service")
     async def test_create_with_export(self, mock_service):
         """Test Canva node with export."""
-        mock_service.create_design = AsyncMock(return_value=type(
-            "Response",
-            (),
-            {
-                "success": True,
-                "design_id": "new-456",
-                "design_url": "https://canva.com/design/new-456",
-                "error": None,
-            },
-        )())
-        mock_service.export_design = AsyncMock(return_value={
-            "url": "https://canva.com/export/new-456.pdf",
-        })
+        mock_service.create_design = AsyncMock(
+            return_value=type(
+                "Response",
+                (),
+                {
+                    "success": True,
+                    "design_id": "new-456",
+                    "design_url": "https://canva.com/design/new-456",
+                    "error": None,
+                },
+            )()
+        )
+        mock_service.export_design = AsyncMock(
+            return_value={
+                "url": "https://canva.com/export/new-456.pdf",
+            }
+        )
 
         config = {
             "operation": "create",
@@ -90,19 +96,21 @@ class TestCanvaMCPNode:
     @patch("app.services.canva_node_service.canva_service")
     async def test_modify_design_operation(self, mock_service):
         """Test Canva node with modify operation."""
-        mock_service.search_templates = AsyncMock(return_value=[
-            {"id": "template-789", "title": "Modern Template"}
-        ])
-        mock_service.modify_design = AsyncMock(return_value=type(
-            "Response",
-            (),
-            {
-                "success": True,
-                "design_id": "modified-789",
-                "design_url": "https://canva.com/design/modified-789",
-                "error": None,
-            },
-        )())
+        mock_service.search_templates = AsyncMock(
+            return_value=[{"id": "template-789", "title": "Modern Template"}]
+        )
+        mock_service.modify_design = AsyncMock(
+            return_value=type(
+                "Response",
+                (),
+                {
+                    "success": True,
+                    "design_id": "modified-789",
+                    "design_url": "https://canva.com/design/modified-789",
+                    "error": None,
+                },
+            )()
+        )
 
         config = {
             "operation": "modify",
@@ -127,9 +135,7 @@ class TestCanvaMCPNode:
     @patch("app.services.canva_node_service.canva_service")
     async def test_error_handling(self, mock_service):
         """Test error handling in Canva node."""
-        mock_service.create_design = AsyncMock(
-            side_effect=Exception("API Error")
-        )
+        mock_service.create_design = AsyncMock(side_effect=Exception("API Error"))
 
         config = {"operation": "create"}
         node_fn = create_canva_mcp_node(config)
@@ -148,17 +154,19 @@ class TestOutputExportNode:
     @patch("app.services.canva_node_service.export_service")
     async def test_export_node_with_link(self, mock_service):
         """Test output export node with link output."""
-        mock_service.export_design = AsyncMock(return_value=type(
-            "Result",
-            (),
-            {
-                "output_type": type("OutputType", (), {"value": "link"})(),
-                "url": "https://canva.com/design/test-123",
-                "filename": None,
-                "canva_edit_url": "https://canva.com/design/test-123",
-                "expires_at": None,
-            },
-        )())
+        mock_service.export_design = AsyncMock(
+            return_value=type(
+                "Result",
+                (),
+                {
+                    "output_type": type("OutputType", (), {"value": "link"})(),
+                    "url": "https://canva.com/design/test-123",
+                    "filename": None,
+                    "canva_edit_url": "https://canva.com/design/test-123",
+                    "expires_at": None,
+                },
+            )()
+        )
 
         config = {
             "outputType": "link",
@@ -193,9 +201,7 @@ class TestOutputExportNode:
     @patch("app.services.canva_node_service.export_service")
     async def test_export_node_exception_handling(self, mock_service):
         """Test output export node error handling."""
-        mock_service.export_design = AsyncMock(
-            side_effect=Exception("Export failed")
-        )
+        mock_service.export_design = AsyncMock(side_effect=Exception("Export failed"))
 
         config = {"outputType": "pdf"}
         node_fn = create_output_export_node(config)

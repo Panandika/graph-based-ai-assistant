@@ -1,14 +1,9 @@
 import logging
-import uuid
-from datetime import UTC, datetime
 from pathlib import Path
 
 from app.core.config import get_settings
 from app.schemas.input import (
-    ImageDimensions,
-    ImageInputOutput,
     ImageUploadResponse,
-    InputSource,
 )
 from app.utils.image_utils import (
     fetch_image_from_url,
@@ -25,7 +20,7 @@ settings = get_settings()
 class InputService:
     """Service for handling file uploads and input processing."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.upload_dir = Path(settings.upload_dir)
         self.upload_dir.mkdir(parents=True, exist_ok=True)
         self.max_size_bytes = settings.upload_max_size_mb * 1024 * 1024
@@ -76,7 +71,7 @@ class InputService:
             content, mime_type = await fetch_image_from_url(image_url)
         except Exception as e:
             logger.error(f"Failed to fetch image from URL: {e}")
-            raise ValueError(f"Failed to fetch image: {str(e)}")
+            raise ValueError(f"Failed to fetch image: {str(e)}") from e
 
         is_valid, error = validate_image(
             content, self.allowed_types, self.max_size_bytes
@@ -114,4 +109,4 @@ class InputService:
         return count
 
 
-input_service = InputService()
+input_service: InputService = InputService()

@@ -193,8 +193,6 @@ class TestCanvaPipeline:
         )
 
         assert len(graph.nodes) == 5
-        vision_node = next(
-            n for n in graph.nodes if n.id == "llm-vision-1"
-        )
+        vision_node = next(n for n in graph.nodes if n.id == "llm-vision-1")
         assert vision_node.data.config["enableVision"] is True
         assert vision_node.data.config["imageDetail"] == "high"

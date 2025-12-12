@@ -15,7 +15,7 @@ class CanvaService:
     Wraps MCP tools with business logic.
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         self._tools: dict[str, BaseTool] = {}
 
     async def _ensure_tools(self) -> None:
@@ -37,7 +37,9 @@ class CanvaService:
 
         create_tool = self._tools.get("canva_create_design")
         if not create_tool:
-            logger.warning("Canva create_design tool not available, using mock response")
+            logger.warning(
+                "Canva create_design tool not available, using mock response"
+            )
             return CanvaDesignResponse(
                 success=True,
                 design_id="mock-design-id",
@@ -46,12 +48,14 @@ class CanvaService:
             )
 
         try:
-            result = await create_tool.ainvoke({
-                "design_type": design_type,
-                "title": title,
-                "elements": elements,
-                "style": style,
-            })
+            result = await create_tool.ainvoke(
+                {
+                    "design_type": design_type,
+                    "title": title,
+                    "elements": elements,
+                    "style": style,
+                }
+            )
 
             return CanvaDesignResponse.model_validate(result)
         except Exception as e:
@@ -78,13 +82,15 @@ class CanvaService:
             return []
 
         try:
-            result = await search_tool.ainvoke({
-                "query": query,
-                "design_type": design_type,
-                "limit": limit,
-            })
+            result = await search_tool.ainvoke(
+                {
+                    "query": query,
+                    "design_type": design_type,
+                    "limit": limit,
+                }
+            )
 
-            return result.get("templates", [])
+            return result.get("templates", [])  # type: ignore
         except Exception as e:
             logger.error(f"Failed to search Canva templates: {e}")
             return []
@@ -99,7 +105,9 @@ class CanvaService:
 
         modify_tool = self._tools.get("canva_modify_design")
         if not modify_tool:
-            logger.warning("Canva modify_design tool not available, using mock response")
+            logger.warning(
+                "Canva modify_design tool not available, using mock response"
+            )
             return CanvaDesignResponse(
                 success=True,
                 design_id=design_id,
@@ -108,10 +116,12 @@ class CanvaService:
             )
 
         try:
-            result = await modify_tool.ainvoke({
-                "design_id": design_id,
-                "modifications": modifications,
-            })
+            result = await modify_tool.ainvoke(
+                {
+                    "design_id": design_id,
+                    "modifications": modifications,
+                }
+            )
 
             return CanvaDesignResponse.model_validate(result)
         except Exception as e:
@@ -142,11 +152,13 @@ class CanvaService:
             }
 
         try:
-            return await export_tool.ainvoke({
-                "design_id": design_id,
-                "format": format,
-                "quality": quality,
-            })
+            return await export_tool.ainvoke(  # type: ignore
+                {
+                    "design_id": design_id,
+                    "format": format,
+                    "quality": quality,
+                }
+            )
         except Exception as e:
             logger.error(f"Failed to export Canva design: {e}")
             return {
@@ -156,4 +168,4 @@ class CanvaService:
             }
 
 
-canva_service = CanvaService()
+canva_service: CanvaService = CanvaService()

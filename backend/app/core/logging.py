@@ -1,6 +1,5 @@
 import logging
 import sys
-from typing import Any
 
 from app.core.config import get_settings
 
@@ -16,10 +15,8 @@ class InterceptHandler(logging.Handler):
 
     def emit(self, record: logging.LogRecord) -> None:
         # Get corresponding Loguru level if it exists
-        try:
-            level = logger.level(record.levelname).name
-        except ValueError:
-            level = record.levelno
+        logger = logging.getLogger("uvicorn.error")  # Fallback or use specific logger
+        level = record.levelno
 
         # Find caller from where originated the logged message
         frame, depth = logging.currentframe(), 2
@@ -27,9 +24,7 @@ class InterceptHandler(logging.Handler):
             frame = frame.f_back  # type: ignore
             depth += 1
 
-        logger.opt(depth=depth, exception=record.exc_info).log(
-            level, record.getMessage()
-        )
+        logger.log(level, record.getMessage())
 
 
 def setup_logging() -> None:
@@ -37,9 +32,7 @@ def setup_logging() -> None:
     Configure logging for the application.
     """
     log_level = "DEBUG" if settings.debug else "INFO"
-    logging_format = (
-        "[%(asctime)s] [%(levelname)s] [%(name)s] %(message)s"
-    )
+    logging_format = "[%(asctime)s] [%(levelname)s] [%(name)s] %(message)s"
 
     logging.basicConfig(
         level=log_level,

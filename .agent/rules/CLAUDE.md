@@ -57,6 +57,13 @@
     * Edges = Logic for routing between nodes.
 * **Memory:** Use `Checkpointer` to persist thread history.
 
+### F. Centralized Utilities (Strict Usage)
+* **Backend Logging:** Use `app.core.logging.setup_logging()`. Do not use `print()`.
+* **Backend Errors:** Exceptions must be handled via `app.core.errors` handlers. Raise `HTTPException` for API errors.
+* **Backend configuration:** All configurations must be in `app.core.config`.
+* **Frontend Config:** Import `config` from `@/config/env`. Do NOT use `import.meta.env` directly in components.
+* **Frontend Notifications:** Use `useToast()` from `@/components/ui/ToastContext`. Do NOT use `alert()` or `console.error()` for user-facing errors.
+
 ---
 
 ## 3. Development Commands

@@ -48,7 +48,7 @@ def create_app() -> FastAPI:
     )
 
     app.include_router(api_router, prefix=settings.api_v1_prefix)
-    app.add_exception_handler(HTTPException, http_exception_handler)
+    app.add_exception_handler(HTTPException, http_exception_handler)  # type: ignore
     app.add_exception_handler(Exception, general_exception_handler)
 
     # Mount static files for uploads

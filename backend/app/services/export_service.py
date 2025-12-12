@@ -1,6 +1,5 @@
 import logging
 from datetime import UTC, datetime, timedelta
-from typing import Any
 
 from app.schemas.export import OutputExportNodeConfig, OutputExportResult, OutputType
 
@@ -35,9 +34,7 @@ class ExportService:
         if output_type == OutputType.LINK:
             return await self._handle_link_export(design_id, design_url, config)
         elif output_type in (OutputType.PDF, OutputType.IMAGE):
-            return await self._handle_file_export(
-                design_id, design_url, url, config
-            )
+            return await self._handle_file_export(design_id, design_url, url, config)
         else:
             raise ValueError(f"Unsupported output type: {output_type}")
 
@@ -50,15 +47,13 @@ class ExportService:
         """Handle link-based export."""
         link_options = config.link_options
 
-        access_level = "edit"
+        # access_level = "edit"
         expires_at = None
 
-        if link_options:
-            access_level = link_options.access_level.value
-            if link_options.expires_in:
-                expires_at = (
-                    datetime.now(UTC) + timedelta(hours=link_options.expires_in)
-                ).isoformat()
+        if link_options and link_options.expires_in:
+            expires_at = (
+                datetime.now(UTC) + timedelta(hours=link_options.expires_in)
+            ).isoformat()
 
         return OutputExportResult(
             output_type=OutputType.LINK,

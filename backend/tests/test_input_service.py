@@ -1,5 +1,4 @@
-from pathlib import Path
-from unittest.mock import AsyncMock, MagicMock, patch
+from unittest.mock import patch
 
 import pytest
 
@@ -53,9 +52,7 @@ class TestInputService:
         session_id = "test-session"
 
         with pytest.raises(ValueError, match="not allowed"):
-            await input_service.save_uploaded_file(
-                txt_content, "test.txt", session_id
-            )
+            await input_service.save_uploaded_file(txt_content, "test.txt", session_id)
 
     @pytest.mark.asyncio
     @patch("app.services.input_service.fetch_image_from_url")

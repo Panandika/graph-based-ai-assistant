@@ -1,9 +1,6 @@
 import base64
 import hashlib
-import io
 import logging
-from pathlib import Path
-from typing import BinaryIO
 
 import httpx
 
@@ -30,9 +27,7 @@ def get_image_dimensions(file_content: bytes) -> ImageDimensions | None:
                     height = int.from_bytes(
                         file_content[offset + 5 : offset + 7], "big"
                     )
-                    width = int.from_bytes(
-                        file_content[offset + 7 : offset + 9], "big"
-                    )
+                    width = int.from_bytes(file_content[offset + 7 : offset + 9], "big")
                     return ImageDimensions(width=width, height=height)
                 length = int.from_bytes(file_content[offset + 2 : offset + 4], "big")
                 offset += 2 + length

@@ -4,11 +4,10 @@ from collections.abc import Awaitable, Callable
 from typing import Any
 
 from langchain_core.messages import BaseMessage, HumanMessage
-from pydantic import BaseModel, ValidationError
+from pydantic import BaseModel
 
-from app.core.config import LLMProvider, get_settings
+from app.core.config import LLMProvider
 from app.core.llm import get_llm
-from app.schemas.canva import CanvaInstructions
 
 logger = logging.getLogger(__name__)
 
@@ -127,19 +126,21 @@ def create_llm_transform_node(
 
         if enable_vision and state.get("input_image_url"):
             image_url = state["input_image_url"]
-            content_parts.append({
-                "type": "image_url",
-                "image_url": {
-                    "url": image_url,
-                    "detail": image_detail,
-                },
-            })
+            content_parts.append(
+                {
+                    "type": "image_url",
+                    "image_url": {
+                        "url": image_url,
+                        "detail": image_detail,
+                    },
+                }
+            )
 
         if content_parts:
             if len(content_parts) == 1 and content_parts[0]["type"] == "text":
                 messages.append(HumanMessage(content=content_parts[0]["text"]))
             else:
-                messages.append(HumanMessage(content=content_parts))
+                messages.append(HumanMessage(content=content_parts))  # type: ignore
 
         response = await llm.ainvoke(messages)
         parsed = parse_llm_response(str(response.content))

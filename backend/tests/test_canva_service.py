@@ -11,46 +11,56 @@ def mock_mcp_manager():
     with patch("app.services.canva_service.mcp_manager") as mock:
         mock_create_tool = MagicMock()
         mock_create_tool.name = "canva_create_design"
-        mock_create_tool.ainvoke = AsyncMock(return_value={
-            "success": True,
-            "design_id": "test-123",
-            "design_url": "https://canva.com/design/test-123",
-        })
+        mock_create_tool.ainvoke = AsyncMock(
+            return_value={
+                "success": True,
+                "design_id": "test-123",
+                "design_url": "https://canva.com/design/test-123",
+            }
+        )
 
         mock_search_tool = MagicMock()
         mock_search_tool.name = "canva_search_templates"
-        mock_search_tool.ainvoke = AsyncMock(return_value={
-            "templates": [
-                {
-                    "id": "template-1",
-                    "title": "Modern Presentation",
-                    "thumbnail_url": "https://example.com/thumb1.jpg",
-                    "design_type": "presentation",
-                }
-            ]
-        })
+        mock_search_tool.ainvoke = AsyncMock(
+            return_value={
+                "templates": [
+                    {
+                        "id": "template-1",
+                        "title": "Modern Presentation",
+                        "thumbnail_url": "https://example.com/thumb1.jpg",
+                        "design_type": "presentation",
+                    }
+                ]
+            }
+        )
 
         mock_modify_tool = MagicMock()
         mock_modify_tool.name = "canva_modify_design"
-        mock_modify_tool.ainvoke = AsyncMock(return_value={
-            "success": True,
-            "design_id": "modified-123",
-            "design_url": "https://canva.com/design/modified-123",
-        })
+        mock_modify_tool.ainvoke = AsyncMock(
+            return_value={
+                "success": True,
+                "design_id": "modified-123",
+                "design_url": "https://canva.com/design/modified-123",
+            }
+        )
 
         mock_export_tool = MagicMock()
         mock_export_tool.name = "canva_export_design"
-        mock_export_tool.ainvoke = AsyncMock(return_value={
-            "url": "https://canva.com/export/test-123.pdf",
-            "format": "pdf",
-        })
+        mock_export_tool.ainvoke = AsyncMock(
+            return_value={
+                "url": "https://canva.com/export/test-123.pdf",
+                "format": "pdf",
+            }
+        )
 
-        mock.get_canva_tools = AsyncMock(return_value=[
-            mock_create_tool,
-            mock_search_tool,
-            mock_modify_tool,
-            mock_export_tool,
-        ])
+        mock.get_canva_tools = AsyncMock(
+            return_value=[
+                mock_create_tool,
+                mock_search_tool,
+                mock_modify_tool,
+                mock_export_tool,
+            ]
+        )
 
         yield mock
 

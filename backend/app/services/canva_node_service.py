@@ -2,7 +2,6 @@ import logging
 from collections.abc import Awaitable, Callable
 from typing import Any
 
-from app.schemas.canva import CanvaOperation
 from app.schemas.export import OutputExportNodeConfig
 from app.services.canva_service import canva_service
 from app.services.export_service import export_service
@@ -97,7 +96,7 @@ async def _resolve_template(
     )
 
     if templates:
-        return templates[0]["id"]
+        return str(templates[0]["id"])
 
     raise ValueError(f"No template found for query: {query}")
 
@@ -112,7 +111,7 @@ def create_output_export_node(
     except Exception as e:
         logger.warning(f"Invalid export config: {e}, using defaults")
         config = OutputExportNodeConfig(
-            output_type="link",
+            output_type="link",  # type: ignore
             download_automatically=False,
             show_preview=True,
         )

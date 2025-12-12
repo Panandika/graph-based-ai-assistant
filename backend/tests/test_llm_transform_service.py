@@ -1,5 +1,5 @@
 import json
-from unittest.mock import AsyncMock, MagicMock, patch
+from unittest.mock import AsyncMock, patch
 
 import pytest
 from langchain_core.messages import AIMessage
@@ -17,15 +17,17 @@ class TestParseLLMResponse:
 
     def test_parse_valid_json_response(self):
         """Test parsing a valid JSON response."""
-        response = json.dumps({
-            "enhanced_text": "Professional presentation about AI",
-            "design_intent": "Create a modern tech presentation",
-            "canva_instructions": {
-                "action": "create",
-                "design_type": "presentation",
-                "elements": [],
-            },
-        })
+        response = json.dumps(
+            {
+                "enhanced_text": "Professional presentation about AI",
+                "design_intent": "Create a modern tech presentation",
+                "canva_instructions": {
+                    "action": "create",
+                    "design_type": "presentation",
+                    "elements": [],
+                },
+            }
+        )
 
         result = parse_llm_response(response)
 
@@ -134,14 +136,16 @@ class TestLLMTransformNode:
         """Test LLM transform with text-only input."""
         mock_llm = AsyncMock()
         mock_response = AIMessage(
-            content=json.dumps({
-                "enhanced_text": "Enhanced content",
-                "design_intent": "Create a poster",
-                "canva_instructions": {
-                    "action": "create",
-                    "design_type": "poster",
-                },
-            })
+            content=json.dumps(
+                {
+                    "enhanced_text": "Enhanced content",
+                    "design_intent": "Create a poster",
+                    "canva_instructions": {
+                        "action": "create",
+                        "design_type": "poster",
+                    },
+                }
+            )
         )
         mock_llm.ainvoke = AsyncMock(return_value=mock_response)
         mock_get_llm.return_value = mock_llm
@@ -177,14 +181,16 @@ class TestLLMTransformNode:
         """Test LLM transform with vision enabled and image input."""
         mock_llm = AsyncMock()
         mock_response = AIMessage(
-            content=json.dumps({
-                "enhanced_text": "Based on the image",
-                "design_intent": "Enhance the photo",
-                "canva_instructions": {
-                    "action": "modify",
-                    "design_type": "social_media",
-                },
-            })
+            content=json.dumps(
+                {
+                    "enhanced_text": "Based on the image",
+                    "design_intent": "Enhance the photo",
+                    "canva_instructions": {
+                        "action": "modify",
+                        "design_type": "social_media",
+                    },
+                }
+            )
         )
         mock_llm.ainvoke = AsyncMock(return_value=mock_response)
         mock_get_llm.return_value = mock_llm

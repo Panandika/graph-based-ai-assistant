@@ -20,7 +20,7 @@ class MCPClientManager:
     Provides tools that can be used directly with LangGraph agents.
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         self._client: Any = None
         self._tools: list[BaseTool] = []
         self._initialized = False
@@ -33,7 +33,7 @@ class MCPClientManager:
         try:
             from langchain_mcp_adapters.client import MultiServerMCPClient
 
-            self._client = MultiServerMCPClient(MCP_SERVERS_CONFIG)
+            self._client = MultiServerMCPClient(MCP_SERVERS_CONFIG)  # type: ignore
             self._tools = await self._client.get_tools()
             self._initialized = True
             logger.info(f"MCP client initialized with {len(self._tools)} tools")
@@ -67,7 +67,7 @@ class MCPClientManager:
             logger.info("MCP client shut down")
 
 
-mcp_manager = MCPClientManager()
+mcp_manager: MCPClientManager = MCPClientManager()
 
 
 async def get_mcp_tools() -> list[BaseTool]:

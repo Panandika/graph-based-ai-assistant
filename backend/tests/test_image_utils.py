@@ -1,5 +1,3 @@
-import pytest
-
 from app.utils.image_utils import (
     encode_to_base64,
     generate_file_hash,

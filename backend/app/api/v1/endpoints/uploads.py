@@ -12,7 +12,7 @@ router = APIRouter()
 
 @router.post("/image", response_model=ImageUploadResponse)
 async def upload_image(
-    file: UploadFile = File(...),
+    file: UploadFile = File(...),  # noqa: B008
     session_id: str = Query(default_factory=lambda: str(uuid.uuid4())),
 ) -> ImageUploadResponse:
     """
@@ -28,10 +28,10 @@ async def upload_image(
         )
         return result
     except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        raise HTTPException(status_code=400, detail=str(e)) from e
     except Exception as e:
         logger.error(f"Failed to upload image: {e}")
-        raise HTTPException(status_code=500, detail="Failed to upload image")
+        raise HTTPException(status_code=500, detail="Failed to upload image") from e
 
 
 @router.post("/image-url", response_model=ImageUploadResponse)
@@ -49,10 +49,10 @@ async def upload_image_from_url(
         )
         return result
     except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        raise HTTPException(status_code=400, detail=str(e)) from e
     except Exception as e:
         logger.error(f"Failed to fetch image from URL: {e}")
-        raise HTTPException(status_code=500, detail="Failed to fetch image")
+        raise HTTPException(status_code=500, detail="Failed to fetch image") from e
 
 
 @router.delete("/session/{session_id}")
@@ -66,4 +66,4 @@ async def cleanup_session(session_id: str) -> dict[str, int]:
         return {"deleted_count": count}
     except Exception as e:
         logger.error(f"Failed to cleanup session: {e}")
-        raise HTTPException(status_code=500, detail="Failed to cleanup session")
+        raise HTTPException(status_code=500, detail="Failed to cleanup session") from e

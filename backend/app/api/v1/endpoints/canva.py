@@ -8,7 +8,6 @@ from app.schemas.canva import (
     ExportRequest,
     ExportResponse,
     ModifyDesignRequest,
-    TemplateSearchRequest,
     TemplateSearchResponse,
 )
 from app.services.canva_service import canva_service
@@ -34,7 +33,7 @@ async def create_design(
         return result
     except Exception as e:
         logger.error(f"Failed to create design: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code=500, detail=str(e)) from e
 
 
 @router.post("/modify", response_model=CanvaDesignResponse)
@@ -52,7 +51,7 @@ async def modify_design(
         return result
     except Exception as e:
         logger.error(f"Failed to modify design: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code=500, detail=str(e)) from e
 
 
 @router.get("/templates", response_model=TemplateSearchResponse)
@@ -71,12 +70,12 @@ async def search_templates(
             limit=limit,
         )
         return TemplateSearchResponse(
-            templates=templates,
+            templates=templates,  # type: ignore
             total_count=len(templates),
         )
     except Exception as e:
         logger.error(f"Failed to search templates: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code=500, detail=str(e)) from e
 
 
 @router.post("/export/{design_id}", response_model=ExportResponse)
@@ -102,4 +101,4 @@ async def export_design(
         )
     except Exception as e:
         logger.error(f"Failed to export design: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code=500, detail=str(e)) from e
