@@ -17,7 +17,7 @@ export interface Position {
 }
 
 export interface LLMNodeConfig {
-  provider: "openai" | "anthropic";
+  provider: "openai" | "anthropic" | "google";
   model: string;
   prompt: string;
 }
@@ -80,7 +80,7 @@ export interface CombinedInput {
 }
 
 export interface LLMTransformNodeConfig {
-  provider: "openai" | "anthropic";
+  provider: "openai" | "anthropic" | "google";
   model: string;
   systemPrompt: string;
   userPromptTemplate: string;

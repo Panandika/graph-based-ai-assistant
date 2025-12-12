@@ -13,6 +13,7 @@ class Environment(str, Enum):
 class LLMProvider(str, Enum):
     OPENAI = "openai"
     ANTHROPIC = "anthropic"
+    GOOGLE = "google"
 
 
 class Settings(BaseSettings):
@@ -40,6 +41,7 @@ class Settings(BaseSettings):
     llm_provider: LLMProvider = LLMProvider.OPENAI
     openai_api_key: str = ""
     anthropic_api_key: str = ""
+    google_api_key: str = ""
     default_model: str = "gpt-4o-mini"
 
     # LangGraph

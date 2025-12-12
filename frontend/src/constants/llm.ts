@@ -1,4 +1,4 @@
-export type LLMProvider = "openai" | "anthropic";
+export type LLMProvider = "openai" | "anthropic" | "google";
 
 export interface ModelOption {
   value: string;
@@ -8,6 +8,7 @@ export interface ModelOption {
 export const LLM_PROVIDERS: { value: LLMProvider; label: string }[] = [
   { value: "openai", label: "OpenAI" },
   { value: "anthropic", label: "Anthropic" },
+  { value: "google", label: "Google" },
 ];
 
 export const MODELS_BY_PROVIDER: Record<LLMProvider, ModelOption[]> = {
@@ -18,6 +19,10 @@ export const MODELS_BY_PROVIDER: Record<LLMProvider, ModelOption[]> = {
   anthropic: [
     { value: "claude-3-5-sonnet-latest", label: "Claude 3.5 Sonnet" },
     { value: "claude-3-5-haiku-latest", label: "Claude 3.5 Haiku" },
+  ],
+  google: [
+    { value: "gemini-1.5-pro", label: "Gemini 1.5 Pro" },
+    { value: "gemini-1.5-flash", label: "Gemini 1.5 Flash" },
   ],
 };
 

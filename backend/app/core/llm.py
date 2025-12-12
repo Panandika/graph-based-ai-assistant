@@ -2,6 +2,7 @@ from typing import Any
 
 from langchain_anthropic import ChatAnthropic
 from langchain_core.language_models.chat_models import BaseChatModel
+from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_openai import ChatOpenAI
 from pydantic import SecretStr
 
@@ -10,6 +11,7 @@ from app.core.config import LLMProvider, get_settings
 SUPPORTED_MODELS: dict[LLMProvider, list[str]] = {
     LLMProvider.OPENAI: ["gpt-4o-mini", "gpt-4o"],
     LLMProvider.ANTHROPIC: ["claude-3-5-sonnet-latest", "claude-3-5-haiku-latest"],
+    LLMProvider.GOOGLE: ["gemini-1.5-pro", "gemini-1.5-flash", "gemini-2.0-flash"],
 }
 
 
@@ -76,6 +78,12 @@ class LLMFactory:
             return ChatAnthropic(
                 model_name=model,
                 api_key=SecretStr(settings.anthropic_api_key),
+                **kwargs,
+            )
+        elif provider == LLMProvider.GOOGLE:
+            return ChatGoogleGenerativeAI(
+                model=model,
+                google_api_key=SecretStr(settings.google_api_key),
                 **kwargs,
             )
         else:
