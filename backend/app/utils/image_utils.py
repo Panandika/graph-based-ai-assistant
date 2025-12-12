@@ -117,7 +117,10 @@ def validate_image(
     Returns (is_valid, error_message).
     """
     if len(content) > max_size_bytes:
-        return False, f"File size exceeds maximum of {max_size_bytes // (1024*1024)}MB"
+        return (
+            False,
+            f"File size exceeds maximum of {max_size_bytes // (1024 * 1024)}MB",
+        )
 
     mime_type = get_mime_type(content)
     if not mime_type:
