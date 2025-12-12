@@ -8,6 +8,7 @@ import type {
   InputCombinedNodeConfig as InputCombinedNodeConfigType,
 } from "@/types";
 
+import { useGraphStore } from "@/store/useGraphStore";
 import { LLMNodeConfig } from "./LLMNodeConfig";
 import { InputTextNodeConfig } from "./nodes/InputTextNodeConfig";
 import { InputImageNodeConfig } from "./nodes/InputImageNodeConfig";
@@ -28,6 +29,7 @@ const nodeStyles: Record<string, { bg: string; border: string }> = {
 };
 
 export function CustomNode({ id, data, selected }: NodeProps) {
+  const { removeNode } = useGraphStore();
   const nodeData = data as NodeData;
   const style = nodeStyles[nodeData.nodeType] || nodeStyles.start;
   const hasConfig =
@@ -40,12 +42,38 @@ export function CustomNode({ id, data, selected }: NodeProps) {
   return (
     <div
       className={`
-        px-4 py-2 rounded-lg border-2
+        px-4 py-2 rounded-lg border-2 relative group
         ${hasConfig ? "min-w-[280px]" : "min-w-[120px]"}
         ${style.bg} ${style.border}
         ${selected ? "ring-2 ring-blue-400" : ""}
       `}
     >
+      <button
+        className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 rounded-full text-white 
+                 flex items-center justify-center opacity-0 group-hover:opacity-100 
+                 transition-opacity hover:bg-red-600 shadow-sm z-50"
+        onClick={(e) => {
+          e.stopPropagation();
+          removeNode(id);
+        }}
+        title="Delete node"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="14"
+          height="14"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
+          <path d="M18 6 6 18" />
+          <path d="m6 6 12 12" />
+        </svg>
+      </button>
+
       {nodeData.nodeType !== "start" && (
         <Handle type="target" position={Position.Top} className="w-3 h-3" />
       )}
@@ -61,7 +89,7 @@ export function CustomNode({ id, data, selected }: NodeProps) {
         <LLMNodeConfig
           nodeId={id}
           config={
-            nodeData.config as {
+            nodeData.config as unknown as {
               provider?: LLMProvider;
               model?: string;
               prompt?: string;
@@ -73,21 +101,21 @@ export function CustomNode({ id, data, selected }: NodeProps) {
       {nodeData.nodeType === "input_text" && (
         <InputTextNodeConfig
           nodeId={id}
-          config={nodeData.config as InputTextNodeConfigType}
+          config={nodeData.config as unknown as InputTextNodeConfigType}
         />
       )}
 
       {nodeData.nodeType === "input_image" && (
         <InputImageNodeConfig
           nodeId={id}
-          config={nodeData.config as InputImageNodeConfigType}
+          config={nodeData.config as unknown as InputImageNodeConfigType}
         />
       )}
 
       {nodeData.nodeType === "input_combined" && (
         <InputCombinedNodeConfig
           nodeId={id}
-          config={nodeData.config as InputCombinedNodeConfigType}
+          config={nodeData.config as unknown as InputCombinedNodeConfigType}
         />
       )}
 
