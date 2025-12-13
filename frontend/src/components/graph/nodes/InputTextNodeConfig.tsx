@@ -1,6 +1,7 @@
 import { useState } from "react";
 import type { InputTextNodeConfig } from "@/types";
 import { useGraphStore } from "@/store/useGraphStore";
+import { NODE_STYLES } from "@/constants/styles";
 
 interface Props {
   nodeId: string;
@@ -33,22 +34,18 @@ export function InputTextNodeConfig({ nodeId, config }: Props) {
         placeholder={config.placeholder || "Enter text..."}
         maxLength={config.maxLength}
         required={config.required}
-        className={`
-          w-full px-2 py-1 text-sm border rounded
-          focus:outline-none focus:ring-2 focus:ring-blue-400
-          ${isOverLimit ? "border-red-500" : "border-gray-300"}
-        `}
+        className={`${NODE_STYLES.TEXTAREA} ${isOverLimit ? "border-red-500" : ""}`}
         rows={3}
       />
       <div className="flex justify-between items-center text-xs">
-        <span className={`${isOverLimit ? "text-red-500" : "text-gray-500"}`}>
+        <span className={`${isOverLimit ? "text-red-500" : NODE_STYLES.HELPER_TEXT}`}>
           {charCount}
           {maxLength !== Infinity && ` / ${maxLength}`} characters
         </span>
         {text && (
           <button
             onClick={() => handleTextChange("")}
-            className="text-gray-500 hover:text-gray-700"
+            className={`${NODE_STYLES.HELPER_TEXT} hover:text-gray-700 dark:hover:text-gray-300`}
           >
             Clear
           </button>
@@ -57,3 +54,4 @@ export function InputTextNodeConfig({ nodeId, config }: Props) {
     </div>
   );
 }
+

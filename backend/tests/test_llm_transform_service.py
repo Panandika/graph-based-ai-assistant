@@ -84,7 +84,7 @@ class TestInputNodes:
         node_fn = await create_input_text_node(config)
 
         state = {
-            "user_input": {
+            "input_data": {
                 "text": "Hello, world!",
             }
         }
@@ -99,7 +99,7 @@ class TestInputNodes:
         config = {}
         node_fn = await create_input_text_node(config)
 
-        state = {"user_input": {}}
+        state = {"input_data": {}}
 
         result = await node_fn(state)
 
@@ -112,7 +112,7 @@ class TestInputNodes:
         node_fn = await create_input_image_node(config)
 
         state = {
-            "user_input": {
+            "input_data": {
                 "image": {
                     "url": "https://example.com/image.jpg",
                     "base64": "base64data",
@@ -124,6 +124,65 @@ class TestInputNodes:
 
         assert result["input_image_url"] == "https://example.com/image.jpg"
         assert result["input_image_base64"] == "base64data"
+        assert result["input_type"] == "image"
+
+    async def test_input_text_node_fallback(self):
+        """Test input text node falls back to config if input_data is missing text."""
+        config = {"text": "Configured Text"}
+        node_fn = await create_input_text_node(config)
+
+        # Empty input data
+        state = {"input_data": {}}
+
+        result = await node_fn(state)
+
+        assert result["input_text"] == "Configured Text"
+        assert result["input_type"] == "text"
+
+    async def test_input_text_node_priority(self):
+        """Test input text node prioritizes input_data over config."""
+        config = {"text": "Configured Text"}
+        node_fn = await create_input_text_node(config)
+
+        state = {
+            "input_data": {
+                "text": "Override Text",
+            }
+        }
+
+        result = await node_fn(state)
+
+        assert result["input_text"] == "Override Text"
+        assert result["input_type"] == "text"
+
+    async def test_input_image_node_fallback(self):
+        """Test input image node falls back to config if input_data is missing image."""
+        config = {"imageUrl": "https://config.com/image.jpg"}
+        node_fn = await create_input_image_node(config)
+
+        state = {"input_data": {}}
+
+        result = await node_fn(state)
+
+        assert result["input_image_url"] == "https://config.com/image.jpg"
+        assert result["input_type"] == "image"
+
+    async def test_input_image_node_priority(self):
+        """Test input image node prioritizes input_data over config."""
+        config = {"imageUrl": "https://config.com/image.jpg"}
+        node_fn = await create_input_image_node(config)
+
+        state = {
+            "input_data": {
+                "image": {
+                    "url": "https://override.com/image.jpg",
+                }
+            }
+        }
+
+        result = await node_fn(state)
+
+        assert result["input_image_url"] == "https://override.com/image.jpg"
         assert result["input_type"] == "image"
 
 

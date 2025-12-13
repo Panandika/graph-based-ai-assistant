@@ -37,6 +37,15 @@ class CanvaService:
 
         create_tool = self._tools.get("canva_create_design")
         if not create_tool:
+            if not mcp_manager.has_canva_token():
+                logger.warning("Canva token missing")
+                return CanvaDesignResponse(
+                    success=False,
+                    design_id="",
+                    design_url="",
+                    error="AuthRequired",
+                )
+
             logger.warning(
                 "Canva create_design tool not available, using mock response"
             )

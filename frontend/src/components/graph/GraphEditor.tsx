@@ -58,7 +58,7 @@ export function GraphEditor({ isSidebarOpen, onToggleSidebar }: GraphEditorProps
     setLogs([]); // Clear previous logs
 
     try {
-      addLog('info', 'Starting graph execution...');
+      addLog('info', 'Initializing execution environment...');
 
       // 1. Create/Save Graph
       addLog('info', 'Saving graph configuration...');
@@ -74,19 +74,19 @@ export function GraphEditor({ isSidebarOpen, onToggleSidebar }: GraphEditorProps
       addLog('info', 'Creating workflow context...');
       const workflow = await graphService.createWorkflow({
         name: `Workflow ${timestamp}`,
-        description: "Debug execution",
+        description: "Execution triggered from editor",
         graph_id: graph.id,
       });
 
       // 3. Execute Workflow
-      addLog('info', 'Initiating execution...');
+      addLog('info', 'Sending execution request...');
+
+      // We send empty input_data, relying on nodes to use their own configuration
       const execution = await graphService.executeWorkflow(workflow.id, {
-        input_data: {
-          prompt: "test run", // Default input for now
-        },
+        input_data: {},
       });
 
-      addLog('success', `Execution started. Thread ID: ${execution.thread_id}`);
+      addLog('success', `Execution started. Thread ID: ${execution.thread_id.slice(0, 8)}...`);
       toast({ type: 'success', message: 'Execution started successfully' });
 
       // 4. Poll for status
@@ -97,7 +97,36 @@ export function GraphEditor({ isSidebarOpen, onToggleSidebar }: GraphEditorProps
           if (status.status === 'COMPLETED') {
             clearInterval(pollInterval);
             setIsRunning(false);
-            addLog('success', 'Execution completed successfully', status.output_data);
+
+            // Check for specific outputs to display nicely
+            const outputData = status.output_data as Record<string, any>;
+
+            if (outputData.final_output) {
+              addLog('success', 'Execution completed successfully');
+              const final = outputData.final_output;
+
+              if (final.url) {
+                addLog('link', 'Access your design:', final.url);
+                if (final.type === 'image' || final.url.match(/\.(jpeg|jpg|gif|png)$/i)) {
+                  addLog('image', 'Design Preview:', final.url);
+                }
+              }
+
+              if (final.edit_url) {
+                addLog('link', 'Edit in Canva:', final.edit_url);
+              }
+
+            } else if (outputData.canva_design_url) {
+              addLog('success', 'Execution completed successfully');
+              addLog('link', 'Canva Design URL:', outputData.canva_design_url);
+              if (outputData.canva_export_url) {
+                addLog('link', 'Export URL:', outputData.canva_export_url);
+                addLog('image', 'Export Preview:', outputData.canva_export_url);
+              }
+            } else {
+              addLog('success', 'Execution completed successfully', outputData);
+            }
+
             toast({ type: 'success', message: 'Execution completed' });
           } else if (status.status === 'FAILED') {
             clearInterval(pollInterval);
@@ -105,8 +134,7 @@ export function GraphEditor({ isSidebarOpen, onToggleSidebar }: GraphEditorProps
             addLog('error', `Execution failed: ${status.error_message}`);
             toast({ type: 'error', message: `Execution failed: ${status.error_message}` });
           } else {
-            // Still running, maybe update status if needed
-            // addLog('info', `Status: ${status.status}`);
+            // Still running
           }
         } catch (error) {
           clearInterval(pollInterval);

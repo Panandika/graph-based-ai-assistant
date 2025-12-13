@@ -2,6 +2,7 @@ import { useState, useRef, useCallback } from "react";
 import type { InputImageNodeConfig, ImageInput } from "@/types";
 import { useGraphStore } from "@/store/useGraphStore";
 import { uploadImage, fetchImageFromUrl } from "@/services/uploadService";
+import { NODE_STYLES } from "@/constants/styles";
 
 interface Props {
   nodeId: string;
@@ -104,7 +105,8 @@ export function InputImageNodeConfig({ nodeId, config }: Props) {
           }
         }
       }
-    },
+    }
+    ,
     [config.allowClipboard, handleFileUpload]
   );
 
@@ -159,7 +161,7 @@ export function InputImageNodeConfig({ nodeId, config }: Props) {
               ref={dropZoneRef}
               onDragOver={handleDragOver}
               onDrop={handleDrop}
-              className="border-2 border-dashed border-gray-300 rounded p-4 text-center hover:border-indigo-400 transition-colors"
+              className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded p-4 text-center hover:border-indigo-400 dark:hover:border-indigo-400 transition-colors bg-gray-50 dark:bg-gray-800/50"
             >
               <input
                 ref={fileInputRef}
@@ -174,15 +176,15 @@ export function InputImageNodeConfig({ nodeId, config }: Props) {
               <button
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
-                className="text-sm text-indigo-600 hover:text-indigo-800 font-medium"
+                className="text-sm text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 font-medium"
               >
                 Click to upload
               </button>
-              <p className="text-xs text-gray-500 mt-1">
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                 or drag and drop
                 {config.allowClipboard && " or paste from clipboard"}
               </p>
-              <p className="text-xs text-gray-400 mt-1">
+              <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
                 Max {config.maxFileSizeMB}MB
               </p>
             </div>
@@ -196,12 +198,12 @@ export function InputImageNodeConfig({ nodeId, config }: Props) {
                 onChange={(e) => setUrlInput(e.target.value)}
                 onKeyPress={(e) => e.key === "Enter" && handleUrlSubmit()}
                 placeholder="Or enter image URL..."
-                className="flex-1 px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-indigo-400"
+                className={NODE_STYLES.INPUT}
               />
               <button
                 onClick={handleUrlSubmit}
                 disabled={!urlInput.trim() || isLoading}
-                className="px-3 py-1 text-sm bg-indigo-600 text-white rounded hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-3 py-1 text-sm bg-indigo-600 hover:bg-indigo-700 text-white rounded disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Load
               </button>
@@ -214,16 +216,16 @@ export function InputImageNodeConfig({ nodeId, config }: Props) {
             <img
               src={imageData.url}
               alt="Preview"
-              className="w-full h-32 object-cover rounded border border-gray-300"
+              className="w-full h-32 object-cover rounded border border-gray-300 dark:border-gray-600"
             />
             <button
               onClick={handleClear}
-              className="absolute top-1 right-1 p-1 bg-red-500 text-white rounded-full hover:bg-red-600 text-xs"
+              className="absolute top-1 right-1 p-1 bg-red-500 text-white rounded-full hover:bg-red-600 text-xs shadow-sm"
             >
               &times;
             </button>
           </div>
-          <div className="text-xs text-gray-600 space-y-1">
+          <div className="text-xs text-gray-600 dark:text-gray-300 space-y-1">
             <div className="flex justify-between">
               <span>Source:</span>
               <span className="font-medium capitalize">{imageData.source}</span>
@@ -250,16 +252,17 @@ export function InputImageNodeConfig({ nodeId, config }: Props) {
 
       {isLoading && (
         <div className="text-center py-2">
-          <div className="inline-block animate-spin rounded-full h-6 w-6 border-b-2 border-indigo-600"></div>
-          <p className="text-xs text-gray-500 mt-1">Loading image...</p>
+          <div className="inline-block animate-spin rounded-full h-6 w-6 border-b-2 border-indigo-600 dark:border-indigo-400"></div>
+          <p className={NODE_STYLES.HELPER_TEXT}>Loading image...</p>
         </div>
       )}
 
       {error && (
-        <div className="text-xs text-red-500 bg-red-50 p-2 rounded">
+        <div className="text-xs text-red-500 bg-red-50 dark:bg-red-900/20 p-2 rounded border border-red-200 dark:border-red-800">
           {error}
         </div>
       )}
     </div>
   );
 }
+

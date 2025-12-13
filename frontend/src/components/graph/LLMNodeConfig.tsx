@@ -6,6 +6,7 @@ import {
   MODELS_BY_PROVIDER,
   type LLMProvider,
 } from "@/constants/llm";
+import { NODE_STYLES } from "@/constants/styles";
 import { useGraphStore } from "@/store/useGraphStore";
 
 interface LLMNodeConfigProps {
@@ -64,17 +65,17 @@ export function LLMNodeConfig({ nodeId, config }: LLMNodeConfigProps) {
 
   return (
     <div
-      className="mt-2 pt-2 border-t border-blue-300 space-y-2"
+      className={NODE_STYLES.CONTAINER}
       onClick={stopPropagation}
       onMouseDown={stopPropagation}
     >
       <div>
-        <label className="block text-xs text-gray-600 mb-1">Provider</label>
+        <label className={NODE_STYLES.LABEL}>Provider</label>
         <select
           value={provider}
           onChange={handleProviderChange}
           onMouseDown={stopPropagation}
-          className="w-full px-2 py-1 text-sm border border-gray-300 rounded bg-white focus:outline-none focus:ring-1 focus:ring-blue-400"
+          className={NODE_STYLES.SELECT}
         >
           {LLM_PROVIDERS.map((p) => (
             <option key={p.value} value={p.value}>
@@ -85,12 +86,12 @@ export function LLMNodeConfig({ nodeId, config }: LLMNodeConfigProps) {
       </div>
 
       <div>
-        <label className="block text-xs text-gray-600 mb-1">Model</label>
+        <label className={NODE_STYLES.LABEL}>Model</label>
         <select
           value={model}
           onChange={handleModelChange}
           onMouseDown={stopPropagation}
-          className="w-full px-2 py-1 text-sm border border-gray-300 rounded bg-white focus:outline-none focus:ring-1 focus:ring-blue-400"
+          className={NODE_STYLES.SELECT}
         >
           {availableModels.map((m) => (
             <option key={m.value} value={m.value}>
@@ -101,9 +102,9 @@ export function LLMNodeConfig({ nodeId, config }: LLMNodeConfigProps) {
       </div>
 
       <div>
-        <label className="block text-xs text-gray-600 mb-1">
+        <label className={NODE_STYLES.LABEL}>
           Prompt{" "}
-          <span className="text-gray-400">
+          <span className={NODE_STYLES.VARIABLE_HINT}>
             (use {"{{variable}}"} for interpolation)
           </span>
         </label>
@@ -114,9 +115,10 @@ export function LLMNodeConfig({ nodeId, config }: LLMNodeConfigProps) {
           onKeyDown={stopPropagation}
           placeholder="Enter prompt... Use {{input}} for variables"
           rows={3}
-          className="w-full px-2 py-1 text-sm border border-gray-300 rounded bg-white focus:outline-none focus:ring-1 focus:ring-blue-400 resize-none"
+          className={NODE_STYLES.TEXTAREA}
         />
       </div>
     </div>
   );
 }
+

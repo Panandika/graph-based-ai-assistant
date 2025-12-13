@@ -162,8 +162,9 @@ async def create_input_text_node(
     """Factory for input text node."""
 
     async def input_text_node(state: dict[str, Any]) -> dict[str, Any]:
-        user_input = state.get("user_input", {})
-        text = user_input.get("text", "")
+        input_data = state.get("input_data", {})
+        # Fallback to node config if text not in input_data
+        text = input_data.get("text") or node_config.get("text", "")
 
         return {
             "input_text": text,
@@ -179,12 +180,19 @@ async def create_input_image_node(
     """Factory for input image node."""
 
     async def input_image_node(state: dict[str, Any]) -> dict[str, Any]:
-        user_input = state.get("user_input", {})
-        image_data = user_input.get("image", {})
+        input_data = state.get("input_data", {})
+        image_data = input_data.get("image", {})
+
+        # Fallback values from node config
+        config_url = node_config.get("imageUrl", "")
+
+        # Priority: input_data > node_config
+        url = image_data.get("url") or config_url
+        base64_data = image_data.get("base64")
 
         return {
-            "input_image_url": image_data.get("url"),
-            "input_image_base64": image_data.get("base64"),
+            "input_image_url": url,
+            "input_image_base64": base64_data,
             "input_type": "image",
         }
 

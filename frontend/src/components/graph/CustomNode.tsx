@@ -1,6 +1,7 @@
 import { Handle, Position, type NodeProps } from "@xyflow/react";
 
 import type { LLMProvider } from "@/constants/llm";
+import { NODE_COLORS } from "@/constants/styles";
 import type {
   NodeData,
   InputTextNodeConfig as InputTextNodeConfigType,
@@ -13,30 +14,18 @@ import { LLMNodeConfig } from "./LLMNodeConfig";
 import { InputTextNodeConfig } from "./nodes/InputTextNodeConfig";
 import { InputImageNodeConfig } from "./nodes/InputImageNodeConfig";
 import { InputCombinedNodeConfig } from "./nodes/InputCombinedNodeConfig";
-
-const nodeStyles: Record<string, { bg: string; border: string }> = {
-  llm: { bg: "bg-blue-100 dark:bg-blue-900/40", border: "border-blue-500 dark:border-blue-400" },
-  tool: { bg: "bg-green-100 dark:bg-green-900/40", border: "border-green-500 dark:border-green-400" },
-  condition: { bg: "bg-yellow-100 dark:bg-yellow-900/40", border: "border-yellow-500 dark:border-yellow-400" },
-  start: { bg: "bg-gray-100 dark:bg-gray-800", border: "border-gray-500 dark:border-gray-400" },
-  end: { bg: "bg-red-100 dark:bg-red-900/40", border: "border-red-500 dark:border-red-400" },
-  input_text: { bg: "bg-purple-100 dark:bg-purple-900/40", border: "border-purple-500 dark:border-purple-400" },
-  input_image: { bg: "bg-indigo-100 dark:bg-indigo-900/40", border: "border-indigo-500 dark:border-indigo-400" },
-  input_combined: { bg: "bg-violet-100 dark:bg-violet-900/40", border: "border-violet-500 dark:border-violet-400" },
-  llm_transform: { bg: "bg-blue-100 dark:bg-blue-900/40", border: "border-blue-500 dark:border-blue-400" },
-  canva_mcp: { bg: "bg-pink-100 dark:bg-pink-900/40", border: "border-pink-500 dark:border-pink-400" },
-  output_export: { bg: "bg-emerald-100 dark:bg-emerald-900/40", border: "border-emerald-500 dark:border-emerald-400" },
-};
+import { CanvaMCPNodeConfig } from "./nodes/CanvaMCPNodeConfig";
 
 export function CustomNode({ id, data, selected }: NodeProps) {
   const { removeNode } = useGraphStore();
   const nodeData = data as NodeData;
-  const style = nodeStyles[nodeData.nodeType] || nodeStyles.start;
+  const style = NODE_COLORS[nodeData.nodeType] || NODE_COLORS.start;
   const hasConfig =
     nodeData.nodeType === "llm" ||
     nodeData.nodeType === "input_text" ||
     nodeData.nodeType === "input_image" ||
     nodeData.nodeType === "input_combined" ||
+    nodeData.nodeType === "canva_mcp" ||
     nodeData.nodeType === "llm_transform";
 
   return (
@@ -85,7 +74,7 @@ export function CustomNode({ id, data, selected }: NodeProps) {
         <div className="font-medium">{nodeData.label}</div>
       </div>
 
-      {nodeData.nodeType === "llm" && (
+      {(nodeData.nodeType === "llm" || nodeData.nodeType === "llm_transform") && (
         <LLMNodeConfig
           nodeId={id}
           config={
@@ -119,6 +108,13 @@ export function CustomNode({ id, data, selected }: NodeProps) {
         />
       )}
 
+      {nodeData.nodeType === "canva_mcp" && (
+        <CanvaMCPNodeConfig
+          nodeId={id}
+          config={nodeData.config}
+        />
+      )}
+
       {nodeData.nodeType !== "end" && (
         <Handle type="source" position={Position.Bottom} className="w-3 h-3" />
       )}
@@ -144,3 +140,4 @@ export function CustomNode({ id, data, selected }: NodeProps) {
     </div>
   );
 }
+

@@ -2,7 +2,7 @@ import { useEffect, useRef, useState, useCallback } from 'react';
 
 export interface LogEntry {
     timestamp: number;
-    type: 'info' | 'success' | 'error' | 'warning';
+    type: 'info' | 'success' | 'error' | 'warning' | 'link' | 'image';
     message: string;
     data?: unknown;
 }
@@ -51,6 +51,41 @@ const MinimizeIcon = ({ size = 24 }: { size?: number }) => (
     </svg>
 );
 
+const LinkIcon = ({ size = 16 }: { size?: number }) => (
+    <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width={size}
+        height={size}
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+    >
+        <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+        <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+    </svg>
+);
+
+const ImageIcon = ({ size = 16 }: { size?: number }) => (
+    <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width={size}
+        height={size}
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+    >
+        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+        <circle cx="8.5" cy="8.5" r="1.5"></circle>
+        <polyline points="21 15 16 10 5 21"></polyline>
+    </svg>
+);
+
 export function TerminalPanel({ logs, isOpen, onToggle, onClear }: TerminalPanelProps) {
     const scrollRef = useRef<HTMLDivElement>(null);
     const [height, setHeight] = useState(384); // Default to h-96 (24rem * 16px = 384px)
@@ -95,15 +130,59 @@ export function TerminalPanel({ logs, isOpen, onToggle, onClear }: TerminalPanel
         };
     }, [isResizing, resize, stopResizing]);
 
+    const renderLogContent = (log: LogEntry) => {
+        switch (log.type) {
+            case 'link':
+                return (
+                    <div className="flex items-center gap-2 text-blue-400 hover:text-blue-300 transition-colors">
+                        <LinkIcon />
+                        <a href={log.data as string} target="_blank" rel="noopener noreferrer" className="underline decoration-blue-400/30 hover:decoration-blue-400">
+                            {log.message}
+                        </a>
+                    </div>
+                );
+            case 'image':
+                return (
+                    <div className="space-y-2">
+                        <div className="flex items-center gap-2 text-purple-400">
+                            <ImageIcon />
+                            <span>{log.message}</span>
+                        </div>
+                        <div className="rounded-lg overflow-hidden border border-gray-800 bg-gray-900/50 max-w-sm">
+                            <img
+                                src={log.data as string}
+                                alt={log.message}
+                                className="w-full h-auto"
+                                loading="lazy"
+                            />
+                        </div>
+                    </div>
+                );
+            default:
+                return (
+                    <>
+                        <div className={`
+                            ${log.type === 'error' ? 'text-red-400' : ''}
+                            ${log.type === 'success' ? 'text-green-400' : ''}
+                            ${log.type === 'warning' ? 'text-yellow-400' : ''}
+                            ${log.type === 'info' ? 'text-blue-400' : ''}
+                        `}>
+                            {log.type === 'success' && '✓ '}
+                            {log.type === 'error' && '✗ '}
+                            {log.message}
+                        </div>
+                        {log.data !== undefined && (
+                            <pre className="mt-1 p-2 bg-gray-900/50 rounded text-xs overflow-x-auto text-gray-300 font-mono">
+                                {typeof log.data === 'string' ? log.data : JSON.stringify(log.data, null, 2)}
+                            </pre>
+                        )}
+                    </>
+                );
+        }
+    };
+
     if (!isOpen) {
-        return (
-            <button
-                onClick={onToggle}
-                className="absolute bottom-4 right-4 bg-gray-900 text-white p-3 rounded-full shadow-lg hover:bg-gray-800 transition-all z-20"
-            >
-                <TerminalIcon size={24} />
-            </button>
-        );
+        return null;
     }
 
     return (
@@ -114,16 +193,21 @@ export function TerminalPanel({ logs, isOpen, onToggle, onClear }: TerminalPanel
             {/* Drag Handle */}
             <div
                 onMouseDown={startResizing}
-                className="w-full h-1 bg-gray-800 hover:bg-blue-500 cursor-ns-resize transition-colors flex justify-center items-center group"
+                className="w-full h-1 bg-gray-800 hover:bg-blue-500 cursor-ns-resize transition-colors flex justify-center items-center group relative -mt-0.5"
             >
-                <div className="w-8 h-1 bg-gray-600 rounded-full opacity-0 group-hover:opacity-100 transition-opacity" />
+                <div className="w-8 h-1 bg-gray-600 rounded-full opacity-0 group-hover:opacity-100 transition-opacity absolute" />
             </div>
 
             {/* Header */}
-            <div className="flex items-center justify-between px-4 py-2 bg-gray-900 border-b border-gray-800">
+            <div className="flex items-center justify-between px-4 py-2 bg-gray-900 border-b border-gray-800 select-none">
                 <div className="flex items-center gap-2">
                     <TerminalIcon size={16} className="text-blue-400" />
-                    <span className="font-semibold">Execution Output</span>
+                    <span className="font-semibold text-gray-100">Execution Output</span>
+                    {logs.length > 0 && (
+                        <span className="text-xs bg-gray-800 px-2 py-0.5 rounded text-gray-400">
+                            {logs.length} lines
+                        </span>
+                    )}
                 </div>
                 <div className="flex items-center gap-2">
                     <button
@@ -144,32 +228,21 @@ export function TerminalPanel({ logs, isOpen, onToggle, onClear }: TerminalPanel
             {/* Content */}
             <div
                 ref={scrollRef}
-                className="flex-1 overflow-y-auto p-4 space-y-2"
+                className="flex-1 overflow-y-auto p-4 space-y-3 font-mono"
             >
                 {logs.length === 0 ? (
-                    <div className="text-gray-500 italic">Ready for execution...</div>
+                    <div className="flex flex-col items-center justify-center h-full text-gray-600 gap-2">
+                        <TerminalIcon size={32} className="opacity-20" />
+                        <div className="italic">Ready for execution...</div>
+                    </div>
                 ) : (
                     logs.map((log, index) => (
-                        <div key={index} className="flex gap-2 items-start animate-in fade-in slide-in-from-bottom-2 duration-300">
-                            <span className="text-gray-500 shrink-0">
-                                [{new Date(log.timestamp).toLocaleTimeString()}]
+                        <div key={index} className="flex gap-3 items-start animate-in fade-in slide-in-from-bottom-1 duration-200">
+                            <span className="text-gray-600 shrink-0 text-xs mt-1 select-none">
+                                [{new Date(log.timestamp).toLocaleTimeString([], { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' })}]
                             </span>
-                            <div className="flex-1">
-                                <div className={`
-                  ${log.type === 'error' ? 'text-red-400' : ''}
-                  ${log.type === 'success' ? 'text-green-400' : ''}
-                  ${log.type === 'warning' ? 'text-yellow-400' : ''}
-                  ${log.type === 'info' ? 'text-blue-400' : ''}
-                `}>
-                                    {log.type === 'success' && '✓ '}
-                                    {log.type === 'error' && '✗ '}
-                                    {log.message}
-                                </div>
-                                {log.data !== undefined && (
-                                    <pre className="mt-1 p-2 bg-gray-900/50 rounded text-xs overflow-x-auto text-gray-300">
-                                        {JSON.stringify(log.data, null, 2)}
-                                    </pre>
-                                )}
+                            <div className="flex-1 min-w-0 break-words">
+                                {renderLogContent(log)}
                             </div>
                         </div>
                     ))
