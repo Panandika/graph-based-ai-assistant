@@ -1,7 +1,7 @@
 from datetime import UTC, datetime
 
 from beanie import PydanticObjectId
-from fastapi import APIRouter, HTTPException, status
+from fastapi import APIRouter, BackgroundTasks, HTTPException, status
 
 from app.models.workflow import Thread, ThreadStatus, Workflow
 from app.schemas.workflow import (
@@ -12,6 +12,7 @@ from app.schemas.workflow import (
     WorkflowResponse,
     WorkflowUpdate,
 )
+from app.services import workflow_service
 
 router = APIRouter()
 
@@ -140,6 +141,7 @@ async def delete_workflow(workflow_id: str) -> None:
 async def execute_workflow(
     workflow_id: str,
     data: ExecuteWorkflowRequest,
+    background_tasks: BackgroundTasks,
 ) -> ExecuteWorkflowResponse:
     """Execute a workflow by creating a new thread."""
     workflow = await Workflow.get(PydanticObjectId(workflow_id))
@@ -155,6 +157,8 @@ async def execute_workflow(
         input_data=data.input_data,
     )
     await thread.insert()
+
+    background_tasks.add_task(workflow_service.execute_workflow, str(thread.id))
 
     return ExecuteWorkflowResponse(
         thread_id=str(thread.id),

@@ -25,6 +25,9 @@ lint: lint-backend lint-frontend ## Run all linters
 lint-backend: ## Lint backend code
 	cd backend && uv run ruff check app && uv run ruff format --check app
 
+fix-backend: ## Auto-fix backend code
+	cd backend && uv run ruff check --fix app && uv run ruff format app
+
 lint-frontend: ## Lint frontend code
 	cd frontend && npm run lint
 

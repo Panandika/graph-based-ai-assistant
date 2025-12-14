@@ -2,6 +2,7 @@ import logging
 from collections.abc import Awaitable, Callable
 from typing import Any
 
+from app.models.state import AgentState
 from app.schemas.export import OutputExportNodeConfig
 from app.services.canva_service import canva_service
 from app.services.export_service import export_service
@@ -11,7 +12,7 @@ logger = logging.getLogger(__name__)
 
 def create_canva_mcp_node(
     node_config: dict[str, Any],
-) -> Callable[[dict[str, Any]], Awaitable[dict[str, Any]]]:
+) -> Callable[[AgentState], Awaitable[dict[str, Any]]]:
     """Factory for Canva MCP node using langchain-mcp-adapters."""
 
     operation = node_config.get("operation", "create")
@@ -21,12 +22,17 @@ def create_canva_mcp_node(
     template_search_query = node_config.get("templateSearchQuery")
     design_name = node_config.get("designName", "Untitled Design")
 
-    async def canva_mcp_node(state: dict[str, Any]) -> dict[str, Any]:
+    async def canva_mcp_node(state: AgentState) -> dict[str, Any]:
         """Execute Canva MCP operations."""
+        logger.info(f"Executing CANVA_MCP node... operation={operation}")
         instructions = state.get("canva_instructions", {})
+        logger.info(f"  Instructions: {instructions}")
 
         try:
             if operation == "create":
+                logger.info(
+                    f"  Creating design: type={instructions.get('design_type', 'document')}, name={design_name}"
+                )
                 result = await canva_service.create_design(
                     design_type=instructions.get("design_type", "document"),
                     title=design_name or state.get("design_intent", "Untitled"),
@@ -34,6 +40,7 @@ def create_canva_mcp_node(
                     style=instructions.get("style_preferences"),
                 )
             else:
+                logger.info(f"  Modifying design: template_source={template_source}")
                 resolved_template_id = await _resolve_template(
                     template_source,
                     template_id,
@@ -45,15 +52,21 @@ def create_canva_mcp_node(
                     modifications=instructions.get("elements", []),
                 )
 
+            logger.info(
+                f"  Design result: success={result.success}, design_id={result.design_id}"
+            )
+
             export_url = None
             if output_format != "link" and result.success:
+                logger.info(f"  Exporting design: format={output_format}")
                 export_result = await canva_service.export_design(
                     design_id=result.design_id,
                     format=output_format,
                 )
                 export_url = export_result.get("url")
+                logger.info(f"  Export URL: {export_url}")
 
-            return {
+            output = {
                 "canva_design_id": result.design_id,
                 "canva_design_url": result.design_url,
                 "canva_export_url": export_url,
@@ -61,6 +74,10 @@ def create_canva_mcp_node(
                 "canva_success": result.success,
                 "canva_error": result.error,
             }
+            logger.info(
+                f"  OUTPUT: success={result.success}, design_url={result.design_url[:50] if result.design_url else 'None'}..."
+            )
+            return output
 
         except Exception as e:
             logger.error(f"Canva MCP node error: {e}")
@@ -103,7 +120,7 @@ async def _resolve_template(
 
 def create_output_export_node(
     node_config: dict[str, Any],
-) -> Callable[[dict[str, Any]], Awaitable[dict[str, Any]]]:
+) -> Callable[[AgentState], Awaitable[dict[str, Any]]]:
     """Factory for output export node."""
 
     try:
@@ -116,11 +133,15 @@ def create_output_export_node(
             show_preview=True,
         )
 
-    async def output_export_node(state: dict[str, Any]) -> dict[str, Any]:
+    async def output_export_node(state: AgentState) -> dict[str, Any]:
         """Process output export."""
+        logger.info("Executing OUTPUT_EXPORT node...")
         design_id = state.get("canva_design_id", "")
         design_url = state.get("canva_design_url", "")
         export_url = state.get("canva_export_url")
+        logger.info(
+            f"  Design ID: {design_id}, URL: {design_url[:50] if design_url else 'None'}..."
+        )
 
         if not design_url:
             logger.warning("No design URL available for export")
@@ -133,6 +154,9 @@ def create_output_export_node(
             }
 
         try:
+            logger.info(
+                f"  Exporting with config: output_type={config.output_type.value}"
+            )
             result = await export_service.export_design(
                 design_id=design_id,
                 design_url=design_url,
@@ -140,7 +164,7 @@ def create_output_export_node(
                 export_url=export_url,
             )
 
-            return {
+            output = {
                 "final_output": {
                     "type": result.output_type.value,
                     "url": result.url,
@@ -149,6 +173,10 @@ def create_output_export_node(
                     "expires_at": result.expires_at,
                 }
             }
+            logger.info(
+                f"  OUTPUT: type={result.output_type.value}, url={result.url[:50] if result.url else 'None'}..."
+            )
+            return output
 
         except Exception as e:
             logger.error(f"Export node error: {e}")

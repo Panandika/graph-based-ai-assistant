@@ -18,6 +18,7 @@ class NodeType(str, Enum):
     LLM_TRANSFORM = "llm_transform"
     CANVA_MCP = "canva_mcp"
     OUTPUT_EXPORT = "output_export"
+    OUTPUT = "output"  # Collect output node
 
 
 class Position(BaseModel):
@@ -31,8 +32,12 @@ class NodeData(BaseModel):
     """Data associated with a graph node."""
 
     label: str
-    node_type: NodeType
+    node_type: NodeType = Field(alias="nodeType")
     config: dict[str, Any] = Field(default_factory=dict)
+    value: dict[str, Any] | None = None
+
+    class Config:
+        populate_by_name = True
 
 
 class GraphNode(BaseModel):

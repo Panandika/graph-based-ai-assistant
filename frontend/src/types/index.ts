@@ -9,7 +9,8 @@ export type NodeType =
   | "input_combined"
   | "llm_transform"
   | "canva_mcp"
-  | "output_export";
+  | "output_export"
+  | "output";
 
 export interface Position {
   x: number;

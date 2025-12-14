@@ -16,6 +16,7 @@ const paletteItems: PaletteItem[] = [
   { type: "tool", label: "Tool", color: "bg-green-200" },
   { type: "canva_mcp", label: "Canva MCP", color: "bg-pink-200" },
   { type: "condition", label: "Condition", color: "bg-yellow-200" },
+  { type: "output", label: "Output", color: "bg-orange-200" },
   { type: "output_export", label: "Output Export", color: "bg-emerald-200" },
   { type: "end", label: "End", color: "bg-red-200" },
 ];

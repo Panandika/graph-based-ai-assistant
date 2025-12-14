@@ -16,10 +16,16 @@ async def execute_workflow(thread_id: str) -> None:
 
     This function is designed to be run as a background task.
     """
+    logger.info(f"=== WORKFLOW EXECUTION STARTED === thread_id={thread_id}")
+
     thread = await Thread.get(PydanticObjectId(thread_id))
     if not thread:
         logger.error(f"Thread {thread_id} not found")
         return
+
+    logger.info(
+        f"Thread loaded: status={thread.status}, workflow_id={thread.workflow_id}"
+    )
 
     workflow = await Workflow.get(PydanticObjectId(thread.workflow_id))
     if not workflow:
@@ -29,6 +35,10 @@ async def execute_workflow(thread_id: str) -> None:
         thread.updated_at = datetime.now(UTC)
         await thread.save()
         return
+
+    logger.info(
+        f"Workflow loaded: name='{workflow.name}', graph_id={workflow.graph_id}"
+    )
 
     if not workflow.graph_id:
         logger.error(f"Workflow {workflow.id} has no graph")
@@ -47,14 +57,23 @@ async def execute_workflow(thread_id: str) -> None:
         await thread.save()
         return
 
+    logger.info(
+        f"Graph loaded: name='{graph.name}', nodes={len(graph.nodes)}, edges={len(graph.edges)}"
+    )
+
     thread.status = ThreadStatus.RUNNING
     thread.updated_at = datetime.now(UTC)
     await thread.save()
+    logger.info("Thread status updated to RUNNING")
 
     try:
+        logger.info("Creating GraphExecutor...")
         executor = GraphExecutor(graph)
+
+        logger.info("Compiling graph...")
         executor.compile()
 
+        logger.info(f"Executing graph with input_data: {thread.input_data}")
         result = await executor.execute(
             thread_id=str(thread.id),
             input_data=thread.input_data,
@@ -64,6 +83,8 @@ async def execute_workflow(thread_id: str) -> None:
         thread.output_data = result
         thread.updated_at = datetime.now(UTC)
         await thread.save()
+        logger.info(f"=== WORKFLOW EXECUTION COMPLETED === thread_id={thread_id}")
+        logger.info(f"Output data keys: {list(result.keys()) if result else 'None'}")
 
     except Exception as e:
         logger.exception(f"Error executing workflow: {e}")
@@ -71,3 +92,4 @@ async def execute_workflow(thread_id: str) -> None:
         thread.error_message = str(e)
         thread.updated_at = datetime.now(UTC)
         await thread.save()
+        logger.error(f"=== WORKFLOW EXECUTION FAILED === thread_id={thread_id}")

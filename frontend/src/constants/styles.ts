@@ -36,4 +36,5 @@ export const NODE_COLORS: Record<string, { bg: string; border: string }> = {
     llm_transform: { bg: "bg-blue-100 dark:bg-blue-900/40", border: "border-blue-500 dark:border-blue-400" },
     canva_mcp: { bg: "bg-pink-100 dark:bg-pink-900/40", border: "border-pink-500 dark:border-pink-400" },
     output_export: { bg: "bg-emerald-100 dark:bg-emerald-900/40", border: "border-emerald-500 dark:border-emerald-400" },
+    output: { bg: "bg-orange-100 dark:bg-orange-900/40", border: "border-orange-500 dark:border-orange-400" },
 };

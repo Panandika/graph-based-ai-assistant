@@ -4,6 +4,7 @@ import {
   Controls,
   MiniMap,
   ReactFlow,
+  useReactFlow,
   type Node,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
@@ -30,8 +31,9 @@ const nodeTypes = {
 };
 
 export function GraphEditor({ isSidebarOpen, onToggleSidebar }: GraphEditorProps) {
-  const { nodes, edges, onNodesChange, onEdgesChange, onConnect, addNode, setSelectedNode } =
+  const { nodes, edges, onNodesChange, onEdgesChange, onConnect, addNode, removeEdge, setSelectedNode } =
     useGraphStore();
+  const { screenToFlowPosition } = useReactFlow();
   const [isRunning, setIsRunning] = useState(false);
   const [isTerminalOpen, setIsTerminalOpen] = useState(false);
   const [isFloatingWindowOpen, setIsFloatingWindowOpen] = useState(false);
@@ -94,7 +96,7 @@ export function GraphEditor({ isSidebarOpen, onToggleSidebar }: GraphEditorProps
         try {
           const status = await graphService.getThreadStatus(workflow.id, execution.thread_id);
 
-          if (status.status === 'COMPLETED') {
+          if (status.status === 'completed') {
             clearInterval(pollInterval);
             setIsRunning(false);
 
@@ -128,7 +130,7 @@ export function GraphEditor({ isSidebarOpen, onToggleSidebar }: GraphEditorProps
             }
 
             toast({ type: 'success', message: 'Execution completed' });
-          } else if (status.status === 'FAILED') {
+          } else if (status.status === 'failed') {
             clearInterval(pollInterval);
             setIsRunning(false);
             addLog('error', `Execution failed: ${status.error_message}`);
@@ -169,10 +171,12 @@ export function GraphEditor({ isSidebarOpen, onToggleSidebar }: GraphEditorProps
       const type = event.dataTransfer.getData("application/reactflow") as NodeType;
       if (!type) return;
 
-      const position = {
-        x: event.clientX - 250,
-        y: event.clientY - 100,
-      };
+      // Use screenToFlowPosition to convert screen coordinates to flow coordinates
+      // This properly accounts for canvas offset, pan, and zoom
+      const position = screenToFlowPosition({
+        x: event.clientX,
+        y: event.clientY,
+      });
 
       const config = type === "llm" ? { ...DEFAULT_LLM_CONFIG } : {};
 
@@ -189,13 +193,20 @@ export function GraphEditor({ isSidebarOpen, onToggleSidebar }: GraphEditorProps
 
       addNode(newNode);
     },
-    [addNode]
+    [addNode, screenToFlowPosition]
   );
 
   const onDragOver = useCallback((event: React.DragEvent) => {
     event.preventDefault();
     event.dataTransfer.dropEffect = "move";
   }, []);
+
+  const onEdgeDoubleClick = useCallback(
+    (_: React.MouseEvent, edge: { id: string }) => {
+      removeEdge(edge.id);
+    },
+    [removeEdge]
+  );
 
   return (
     <div className="w-full h-full relative">
@@ -260,6 +271,7 @@ export function GraphEditor({ isSidebarOpen, onToggleSidebar }: GraphEditorProps
         onPaneClick={onPaneClick}
         onDrop={onDrop}
         onDragOver={onDragOver}
+        onEdgeDoubleClick={onEdgeDoubleClick}
         nodeTypes={nodeTypes}
         fitView
       >

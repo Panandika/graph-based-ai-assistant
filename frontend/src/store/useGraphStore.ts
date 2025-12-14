@@ -13,6 +13,7 @@ interface GraphState {
   onConnect: OnConnect;
   addNode: (node: Node<NodeData>) => void;
   removeNode: (nodeId: string) => void;
+  removeEdge: (edgeId: string) => void;
   updateNodeData: (nodeId: string, data: Partial<NodeData>) => void;
   setSelectedNode: (nodeId: string | null) => void;
   setNodes: (nodes: Node<NodeData>[]) => void;
@@ -45,6 +46,12 @@ export const useGraphStore = create<GraphState>((set, get) => ({
     set({
       nodes: get().nodes.filter((n) => n.id !== nodeId),
       edges: get().edges.filter((e) => e.source !== nodeId && e.target !== nodeId),
+    });
+  },
+
+  removeEdge: (edgeId) => {
+    set({
+      edges: get().edges.filter((e) => e.id !== edgeId),
     });
   },
 

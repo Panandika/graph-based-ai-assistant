@@ -81,7 +81,7 @@ class TestInputNodes:
     async def test_input_text_node(self):
         """Test input text node processes text correctly."""
         config = {}
-        node_fn = await create_input_text_node(config)
+        node_fn = create_input_text_node(config)
 
         state = {
             "input_data": {
@@ -97,7 +97,7 @@ class TestInputNodes:
     async def test_input_text_node_empty(self):
         """Test input text node handles missing text."""
         config = {}
-        node_fn = await create_input_text_node(config)
+        node_fn = create_input_text_node(config)
 
         state = {"input_data": {}}
 
@@ -109,7 +109,7 @@ class TestInputNodes:
     async def test_input_image_node(self):
         """Test input image node processes image data correctly."""
         config = {}
-        node_fn = await create_input_image_node(config)
+        node_fn = create_input_image_node(config)
 
         state = {
             "input_data": {
@@ -129,7 +129,7 @@ class TestInputNodes:
     async def test_input_text_node_fallback(self):
         """Test input text node falls back to config if input_data is missing text."""
         config = {"text": "Configured Text"}
-        node_fn = await create_input_text_node(config)
+        node_fn = create_input_text_node(config)
 
         # Empty input data
         state = {"input_data": {}}
@@ -142,7 +142,7 @@ class TestInputNodes:
     async def test_input_text_node_priority(self):
         """Test input text node prioritizes input_data over config."""
         config = {"text": "Configured Text"}
-        node_fn = await create_input_text_node(config)
+        node_fn = create_input_text_node(config)
 
         state = {
             "input_data": {
@@ -158,7 +158,7 @@ class TestInputNodes:
     async def test_input_image_node_fallback(self):
         """Test input image node falls back to config if input_data is missing image."""
         config = {"imageUrl": "https://config.com/image.jpg"}
-        node_fn = await create_input_image_node(config)
+        node_fn = create_input_image_node(config)
 
         state = {"input_data": {}}
 
@@ -170,7 +170,7 @@ class TestInputNodes:
     async def test_input_image_node_priority(self):
         """Test input image node prioritizes input_data over config."""
         config = {"imageUrl": "https://config.com/image.jpg"}
-        node_fn = await create_input_image_node(config)
+        node_fn = create_input_image_node(config)
 
         state = {
             "input_data": {
